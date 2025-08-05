@@ -19,7 +19,7 @@ def get_clean_harmony(score: stream.Score):
         clean_part.append(key_signature)
 
         previous_note = None
-        for n in part.flat.notes:
+        for n in part.flatten().notes:
             n.expressions = []
 
             beat = n.beat
@@ -39,13 +39,4 @@ def get_clean_harmony(score: stream.Score):
 
 def get_soprano(score: stream.Score):
     return score.parts[0]
-
-
-score = get_bach_corpus(9)
-
-#score.show()
-get_clean_harmony(score).show()
-
-#get_soprano(score).show()
-#get_soprano(get_clean_harmony(score).show()
 
