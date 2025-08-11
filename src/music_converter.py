@@ -1,5 +1,5 @@
 from music21 import *
-from score_utils import *
+
 
 def soprano_to_chromosom(soprano: stream.Score):
     chromosom = []
@@ -15,14 +15,14 @@ def soprano_to_chromosom(soprano: stream.Score):
 
     return chromosom
 
-
 def tone_to_chromosom(note_obj, key: key.Key, tonic: pitch.Pitch):
-    #print(f"tone_to_chromosom: primljen element tipa {type(note_obj)}, sadržaj: {note_obj}")
     if isinstance(note_obj, note.Rest):
-        #print("tone_to_chromosom: Pauza detektovana, vraćam None")
         return None
     
-    tone = note_obj.pitch
+    if isinstance(note_obj, note.Note):
+        tone = note_obj.pitch
+    elif isinstance(note_obj, pitch.Pitch):
+        tone = note_obj
 
     scale = key.getScale()
 
@@ -60,7 +60,6 @@ def tone_to_chromosom(note_obj, key: key.Key, tonic: pitch.Pitch):
 
     return [first_num, second_num]
 
-
 def get_tonic_pitch(key_signature: key.Key):
     tonic_pitch = key_signature.tonic
 
@@ -75,7 +74,6 @@ def get_tonic_pitch(key_signature: key.Key):
     
     tonic_pitch.octave = octave
     return tonic_pitch
-
 
 def score_to_chromosom(score):
     parts = list(score.parts)[:4]
@@ -146,24 +144,108 @@ def score_to_chromosom(score):
 
     return chromosom
 
+def chromosom_to_midi(tone: list, key: key.Key):
+    degree_offset, alteration = tone
+    
+    tonic_pitch = get_tonic_pitch(key)
+    tonic_pitch = tonic_pitch.transpose(0)
 
+    scale = key.getScale()
+    target_pitch = scale.pitchFromDegree((degree_offset % 7) + 1)
 
+    octave_shift = degree_offset // 7
+    target_pitch.octave += octave_shift
 
+    target_pitch = target_pitch.transpose(alteration)
 
-broj = 13
-korpus_cist = get_bach_corpus(broj)
+    return target_pitch.midi
 
-korpus = get_clean_harmony(korpus_cist)
+def midi_to_chromosom(midi: int, key: key.Key):
+    tonic_pitch = get_tonic_pitch(key)
 
-# sopran = get_soprano(korpus)
+    n = note.Note(midi)
 
-# #print(soprano_to_chromosom(sopran))
-# print(soprano_to_chromosom(korpus))
+    return tone_to_chromosom(n, key, tonic_pitch)
 
+def combine_voices(soprano: list, three_voices: list):
+    all = []
+    for i in range(len(soprano)):
+        new_list = [soprano[i]] + three_voices[i]
+        all.append(new_list)
+    return all
 
-aligned = score_to_chromosom(korpus)
-print(aligned)
+def chromosom_to_tone(chrom: list, key_signature: key.Key, tonic: pitch.Pitch):
+    if chrom is None:
+        return None
 
+    notes_order = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+    
+    first_num, second_num = chrom
+    
+    tonic_idx = notes_order.index(tonic.name[0].upper())
+    
+    note_idx = (tonic_idx + first_num) % 7
+    note_letter = notes_order[note_idx]
+    
+    octave_shift = (tonic_idx + first_num) // 7
+    octave = tonic.octave + octave_shift
+    
+    base_pitch = pitch.Pitch()
+    base_pitch.octave = octave
+    base_pitch.name = note_letter
 
+    scale = key_signature.getScale()
 
-korpus.show()
+    p = pitch.Pitch(base_pitch.nameWithOctave)
+    _, a = scale.getScaleDegreeAndAccidentalFromPitch(base_pitch)
+
+    a_val = a.alter if a is not None else 0
+    if a is not None:
+        current_alter = p.accidental.alter if p.accidental else 0
+        p.accidental = pitch.Accidental(current_alter - a_val)
+
+    if second_num == 0:
+        return p
+    else:
+        base_alter = p.accidental.alter if p.accidental is not None else 0
+
+        new_alter = base_alter + second_num
+        
+        p.accidental = pitch.Accidental(new_alter)
+        
+        return p
+    
+def build_full_score(soprano_part: stream.Part, other_voices_chrom: list, key_signature: key.Key):
+    tonic_pitch = get_tonic_pitch(key_signature)
+
+    full_score = stream.Score()
+    full_score.append(soprano_part)
+
+    voice_names = ['alto', 'tenor', 'bass']
+    other_parts = [stream.Part(id=voice_name) for voice_name in voice_names]
+
+    for part in other_parts:
+        part.append(key_signature)
+
+    soprano_notes = list(soprano_part.notesAndRests)
+    for i, sop_note in enumerate(soprano_notes):
+        chroms = other_voices_chrom[i]
+
+        for voice_idx in range(3):
+            chrom = chroms[voice_idx]
+
+            if isinstance(sop_note, note.Rest):
+                new_note = note.Rest()
+                new_note.duration = sop_note.duration
+            else:
+                new_pitch = chromosom_to_tone(chrom, key_signature, tonic_pitch)
+                new_note = note.Note(new_pitch)
+                new_note.duration = sop_note.duration
+
+            other_parts[voice_idx].append(new_note)
+
+    for part in other_parts:
+        full_score.append(part)
+
+    return full_score
+    
