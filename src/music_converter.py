@@ -1,8 +1,8 @@
 from music21 import *
 
 
-def soprano_to_chromosom(soprano: stream.Score):
-    chromosom = []
+def soprano_to_chromosome(soprano: stream.Score):
+    chromosome = []
 
     detected_key = soprano.analyze('key') #TODO dodatak da se smanji greska
 
@@ -10,12 +10,12 @@ def soprano_to_chromosom(soprano: stream.Score):
     
     for note in soprano.flatten().notes:
         current_pitch = note.pitch 
-        chromosom.append(tone_to_chromosom(current_pitch, detected_key, tonic))
+        chromosome.append(tone_to_chromosome(current_pitch, detected_key, tonic))
 
 
-    return chromosom
+    return chromosome
 
-def tone_to_chromosom(note_obj, key: key.Key, tonic: pitch.Pitch):
+def tone_to_chromosome(note_obj, key: key.Key, tonic: pitch.Pitch):
     if isinstance(note_obj, note.Rest):
         return None
     
@@ -75,7 +75,7 @@ def get_tonic_pitch(key_signature: key.Key):
     tonic_pitch.octave = octave
     return tonic_pitch
 
-def score_to_chromosom(score):
+def score_to_chromosome(score):
     parts = list(score.parts)[:4]
     seqs = [list(p.flatten().notesAndRests) for p in parts]
 
@@ -91,7 +91,7 @@ def score_to_chromosom(score):
     detected_key = score.analyze('key')
     tonic = get_tonic_pitch(detected_key)
 
-    chromosom = []
+    chromosome = []
 
     while any(indices[v] < len(seqs[v]) for v in range(4)):
         active = [remaining[v] for v in range(4) if indices[v] < len(seqs[v])]
@@ -127,9 +127,9 @@ def score_to_chromosom(score):
                 moment.append(None)
                 continue
             el = seqs[v][indices[v]]
-            moment.append(tone_to_chromosom(el, detected_key, tonic))
+            moment.append(tone_to_chromosome(el, detected_key, tonic))
 
-        chromosom.append(moment)
+        chromosome.append(moment)
 
         for v in range(4):
             if indices[v] >= len(seqs[v]):
@@ -142,13 +142,12 @@ def score_to_chromosom(score):
                 else:
                     remaining[v] = float('inf')
 
-    return chromosom
+    return chromosome
 
-def chromosom_to_midi(tone: list, key: key.Key):
+def chromosome_to_midi(tone: list, key: key.Key):
     degree_offset, alteration = tone
     
     tonic_pitch = get_tonic_pitch(key)
-    tonic_pitch = tonic_pitch.transpose(0)
 
     scale = key.getScale()
     target_pitch = scale.pitchFromDegree((degree_offset % 7) + 1)
@@ -156,16 +155,20 @@ def chromosom_to_midi(tone: list, key: key.Key):
     octave_shift = degree_offset // 7
     target_pitch.octave += octave_shift
 
+    if tonic_pitch.octave == 3:
+        target_pitch.octave -= 1
+
     target_pitch = target_pitch.transpose(alteration)
 
     return target_pitch.midi
 
-def midi_to_chromosom(midi: int, key: key.Key):
+
+def midi_to_chromosome(midi: int, key: key.Key):
     tonic_pitch = get_tonic_pitch(key)
 
     n = note.Note(midi)
 
-    return tone_to_chromosom(n, key, tonic_pitch)
+    return tone_to_chromosome(n, key, tonic_pitch)
 
 def combine_voices(soprano: list, three_voices: list):
     all = []
@@ -174,7 +177,7 @@ def combine_voices(soprano: list, three_voices: list):
         all.append(new_list)
     return all
 
-def chromosom_to_tone(chrom: list, key_signature: key.Key, tonic: pitch.Pitch):
+def chromosome_to_tone(chrom: list, key_signature: key.Key, tonic: pitch.Pitch):
     if chrom is None:
         return None
 
@@ -238,7 +241,7 @@ def build_full_score(soprano_part: stream.Part, other_voices_chrom: list, key_si
                 new_note = note.Rest()
                 new_note.duration = sop_note.duration
             else:
-                new_pitch = chromosom_to_tone(chrom, key_signature, tonic_pitch)
+                new_pitch = chromosome_to_tone(chrom, key_signature, tonic_pitch)
                 new_note = note.Note(new_pitch)
                 new_note.duration = sop_note.duration
 

@@ -1,6 +1,7 @@
 from music_converter import *
 from initial_population import *
 from score_utils import *
+from constraints import * #TODO obrisati kasnije
 
 def main():
     broj = 4
@@ -9,7 +10,7 @@ def main():
     korpus = get_clean_harmony(korpus_cist)
 
     sopran = get_soprano(korpus)
-    sopran_chrom = soprano_to_chromosom(sopran)
+    sopran_chrom = soprano_to_chromosome(sopran)
 
     detected_key = sopran.analyze('key')
     
@@ -18,12 +19,9 @@ def main():
     sve = combine_voices(sopran_chrom, ostali_glasovi)
 
     generisano = build_full_score(sopran, ostali_glasovi, detected_key)
+    
 
-    # print(sopran_chrom)
-    # print(ostali_glasovi)
-    print(sve)
-
-    generisano.show()
+    #generisano.show()
 
 if __name__ == "__main__":
     main()
