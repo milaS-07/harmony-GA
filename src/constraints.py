@@ -90,4 +90,19 @@ def check_monotone_motion(chromosome: list):
             score -= penalty
 
     return score
-            
+
+def check_voice_spacing(chromosome: list):
+    if len(chromosome[0]) != 4:
+        raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
+    
+    penalty = 4
+    score = 0
+    for moment in chromosome:
+        for i, tone in enumerate(moment[:-2]):
+            if tone[0] - moment[i+1][0] > 7:
+                score -= penalty
+
+        if moment[2][0] - moment[3][0] > 14:
+            score -= penalty
+
+    return score
