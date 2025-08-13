@@ -59,9 +59,35 @@ def check_voice_overlap(chromosome: list):
         for j, (tone, alteration) in enumerate(moment[1:]):
             next_tone, next_alteration = next_moment[j]
             if tone > next_tone:
+                # print(3)
+                # print(i, moment)
+                # print(tone, next_tone)
                 score -= penalty
             elif tone == next_tone:
                 if alteration > next_alteration:
+                    # print(4)
+                    # print(i, moment)
+                    # print(tone, next_tone)
                     score -= penalty
 
     return score
+
+def check_monotone_motion(chromosome: list):
+    if len(chromosome[0]) != 4:
+        raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
+    
+    penalty = 3
+    score = 0
+    for i, curr in enumerate(chromosome[1:]):
+        prev = chromosome[i]
+        # ekstrakt tonova
+        prev_tones = [t[0] for t in prev]
+        curr_tones = [t[0] for t in curr]
+
+        if all(tone1 < tone2 for tone1, tone2 in zip(prev_tones, curr_tones)):
+            score -= penalty
+        elif all(tone1 > tone2 for tone1, tone2 in zip(prev_tones, curr_tones)):
+            score -= penalty
+
+    return score
+            

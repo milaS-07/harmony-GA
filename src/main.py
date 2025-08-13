@@ -21,8 +21,8 @@ def main():
 
     generisano = build_full_score(sopran, ostali_glasovi, detected_key)
     
-    print(check_voice_overlap(sve))
-    generisano.show()
+    print(check_monotone_motion([[[1,0],[1,0],[1,0],[1,0]], [[2,0],[2,0],[2,0],[2,0]]]))
+    #generisano.show()
 
 if __name__ == "__main__":
     main()

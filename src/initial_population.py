@@ -48,7 +48,7 @@ def generate_individual(soprano: list, key: key.Key):
 def right_voice_ranges(tone: int, alteration: int, upper_limit: int, key: key.Key):
     return chromosome_to_midi([tone, alteration], key) <= upper_limit
 
-def no_voice_overlap(tone: int, alteration: int, last_moment: list, voice_ind: int, moment_ind: int, soprano: list):
+def no_voice_overlap(tone: int, alteration: int, last_moment: list, voice_ind: int, moment_ind: int, soprano: list): #TODO da nikad ne gresi
     whole_last_moment = [soprano[moment_ind - 1]]
     whole_last_moment.extend(last_moment)
 
