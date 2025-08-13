@@ -162,7 +162,6 @@ def chromosome_to_midi(tone: list, key: key.Key):
 
     return target_pitch.midi
 
-
 def midi_to_chromosome(midi: int, key: key.Key):
     tonic_pitch = get_tonic_pitch(key)
 

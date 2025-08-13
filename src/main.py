@@ -2,6 +2,7 @@ from music_converter import *
 from initial_population import *
 from score_utils import *
 from constraints import * #TODO obrisati kasnije
+from fitness import *
 
 def main():
     broj = 4
@@ -20,8 +21,8 @@ def main():
 
     generisano = build_full_score(sopran, ostali_glasovi, detected_key)
     
-    print(check_voice_crossing([[[2, -1], [2, 0], [3, 0], [1, 0]]]))
-    #generisano.show()
+    print(check_voice_overlap(sve))
+    generisano.show()
 
 if __name__ == "__main__":
     main()
