@@ -20,3 +20,20 @@ def check_voice_range(chromosome: list, key: key.Key):
                 score -= RANGES[i][0] - curr_midi
 
     return score
+
+def check_voice_crossing(chromosome: list):
+    if len(chromosome[0]) != 4:
+        raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
+    
+    score = 0
+
+    for moment in chromosome:
+        for i, note in enumerate(moment[:-1]):
+            if note[0] < moment[i+1][0]:
+                score -= 5
+            elif note[0] == moment[i+1][0]:
+                if note[1] < moment[i+1][1]:
+                    score -= 5
+
+
+    return score
