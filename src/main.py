@@ -22,7 +22,8 @@ def main():
     generisano = build_full_score(sopran, ostali_glasovi, detected_key)
     
     print(check_voice_overlap(sve))
-    generisano.show()
+    print(check_voice_range(ostali_glasovi, detected_key))
+    #generisano.show()
 
 if __name__ == "__main__":
     main()
