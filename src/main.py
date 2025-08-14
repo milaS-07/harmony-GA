@@ -1,3 +1,4 @@
+import random
 from music_converter import *
 from initial_population import *
 from score_utils import *
@@ -5,8 +6,12 @@ from constraints import * #TODO obrisati kasnije
 from fitness import *
 from selection import *
 from crossover import *
+from mutation import *
 
 def main():
+    num_generation = 100
+    population_size = 100  
+
     broj = 13
     korpus_cist = get_bach_corpus(broj)
 
@@ -17,26 +22,27 @@ def main():
 
     detected_key = sopran.analyze('key')
     
-    ostali_glasovi = generate_initial_population(sopran_chrom, detected_key, 5)#[0]
+    population = generate_initial_population(sopran_chrom, detected_key, population_size)
 
-    # sve = combine_voices(sopran_chrom, ostali_glasovi)
+    print(get_population_fitness(population, sopran_chrom, detected_key))
+    print("---")
+
+    for _ in range(num_generation):
+        fitnesses = get_population_fitness(population, sopran_chrom, detected_key)
+        population = select_new_population(population, fitnesses)
+        fitnesses_after_selection = get_population_fitness(population, sopran_chrom, detected_key)
+        print(fitnesses_after_selection)
+        print("---")
+        random.shuffle(population) #valjda dobra ideja nmp
+        population = do_crossover(population)
+        population = mutate_population(population, detected_key)
+
+    print("kraj")
+    print(fitnesses)
 
 
-    # generisano = build_full_score(sopran, ostali_glasovi, detected_key)
-    
-    fitnesi = get_population_fitness(ostali_glasovi, sopran_chrom, detected_key)
-
-    print(fitnesi)
-
-    izbor = select_new_population(ostali_glasovi, fitnesi)
-
-    fitnesi_novi = get_population_fitness(izbor, sopran_chrom, detected_key)
-
-    print(fitnesi_novi)
-
-
-    generisano2 = build_full_score(sopran, izbor[0], detected_key)
-    generisano2.show()
+    best_fitness_genereted = build_full_score(sopran, population[0], detected_key)
+    best_fitness_genereted.show()
 
 if __name__ == "__main__":
     main()

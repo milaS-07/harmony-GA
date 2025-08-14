@@ -19,6 +19,16 @@ def select_new_population(population: list, fitnesses: list):
     num_to_select = pop_size - num_elite
     selected_individuals = []
 
+    min_fitness = min(remaining_fitnesses)
+    if min_fitness < 0:
+        remaining_fitnesses = [f - min_fitness + 1 for f in remaining_fitnesses]
+
+    total_fitness = sum(remaining_fitnesses)
+    probabilities = [f / total_fitness for f in remaining_fitnesses]
+
+    num_to_select = pop_size - num_elite
+    selected_individuals = []
+
     for _ in range(num_to_select):
         r = random.random()
         cumulative = 0
