@@ -4,11 +4,9 @@ from music_converter import midi_to_chromosome, chromosome_to_midi
 from constraints import RANGES
 
 
-def generate_initial_population(soprano: list, key: key.Key):
+def generate_initial_population(soprano: list, key: key.Key, num_population: int):
     population = []
-
-    num_population = 1
-
+    
     for i in range(num_population):
         population.append(generate_individual(soprano, key))
 
