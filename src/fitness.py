@@ -14,5 +14,6 @@ def get_individual_fitness(individual: list, soprano: list, key: key.Key):
     fitness += check_voice_overlap(voices_combined)
     fitness += check_monotone_motion(voices_combined)
     fitness += check_voice_spacing(voices_combined)
+    fitness += check_parallel_intervals(voices_combined)
 
     return fitness

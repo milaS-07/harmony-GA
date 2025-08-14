@@ -106,3 +106,26 @@ def check_voice_spacing(chromosome: list):
             score -= penalty
 
     return score
+
+def check_parallel_intervals(chromosome: list):
+    if len(chromosome[0]) != 4:
+        raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
+    
+    penalty = 5
+    score = 0
+    for i, moment in enumerate(chromosome[:-1]):
+        for j, voice in enumerate(moment[:-1]):
+            next_moment = chromosome[i + 1]
+
+            curr_tone_up = voice[0]
+            curr_tone_down = moment[j + 1][0]
+            next_tone_up = next_moment[j][0]
+            next_tone_down = next_moment[j + 1][0]
+
+            interval_current = abs(curr_tone_up - curr_tone_down)
+            interval_next = abs(next_tone_up - next_tone_down)
+
+            if interval_current == interval_next and (interval_current == 4 or interval_current == 7):
+                score -= penalty
+
+    return score

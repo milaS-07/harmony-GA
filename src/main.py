@@ -21,8 +21,8 @@ def main():
 
     generisano = build_full_score(sopran, ostali_glasovi, detected_key)
     
-    print(get_individual_fitness(ostali_glasovi, sopran_chrom, detected_key))
-    generisano.show()
+    print(check_parallel_intervals([[[5, 0], [1, 0], [2, 0], [1, 0]], [[4, 0], [0, 0], [2, 0], [1, 0]]]))
+    #generisano.show()
 
 if __name__ == "__main__":
     main()
