@@ -5,7 +5,7 @@ from constraints import * #TODO obrisati kasnije
 from fitness import *
 
 def main():
-    broj = 10
+    broj = 11
     korpus_cist = get_bach_corpus(broj)
 
     korpus = get_clean_harmony(korpus_cist)

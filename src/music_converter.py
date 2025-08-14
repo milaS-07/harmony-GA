@@ -230,7 +230,6 @@ def build_full_score(soprano_part: stream.Part, other_voices_chrom: list, key_si
         part.append(key_signature)
 
     soprano_notes = list(soprano_part.notesAndRests)
-    print(len(soprano_notes), len(other_voices_chrom))
 
     chrom_index = 0
     for sop_note in soprano_notes:
