@@ -33,7 +33,7 @@ def generate_individual(soprano: list, key: key.Key):
 
             while True:
                 tone = random.randint(down_chrom, up_chrom)
-                if right_voice_ranges(tone, alteration, upper_limit, key):
+                if right_voice_ranges(tone, alteration, upper_limit, key) and (right_voice_spacing(moment, tone, soprano[i]) or random.randint(0, 10) == 1):
                     if i == 0 or no_voice_overlap(tone, alteration, individual[i-1], j + 1, i, soprano):
                         upper_limit = chromosome_to_midi([tone, alteration], key)
 
@@ -75,3 +75,16 @@ def no_voice_overlap(tone: int, alteration: int, last_moment: list, voice_ind: i
         else:
             return False
 
+def right_voice_spacing(moment: list, tone: int, soprano_moment: list):
+    moment_length = len(moment)
+    if moment_length == 3:
+        if moment[2][0] - tone > 14:
+            return False
+    elif moment_length == 2:
+        if moment[0][0] - tone > 7:
+            return False
+    else:
+        if soprano_moment[0] - tone > 7:
+            return False
+        
+    return True

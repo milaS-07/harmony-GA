@@ -21,8 +21,8 @@ def main():
 
     generisano = build_full_score(sopran, ostali_glasovi, detected_key)
     
-    print(check_voice_spacing([[[1,0],[1,0],[1,0],[1,0]], [[10,0],[2,0],[2,0],[2,0]]]))
-    #generisano.show()
+    print(get_individual_fitness(ostali_glasovi, sopran_chrom, detected_key))
+    generisano.show()
 
 if __name__ == "__main__":
     main()
