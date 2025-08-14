@@ -5,7 +5,7 @@ from constraints import * #TODO obrisati kasnije
 from fitness import *
 
 def main():
-    broj = 4
+    broj = 10
     korpus_cist = get_bach_corpus(broj)
 
     korpus = get_clean_harmony(korpus_cist)
@@ -19,10 +19,11 @@ def main():
 
     sve = combine_voices(sopran_chrom, ostali_glasovi)
 
+
     generisano = build_full_score(sopran, ostali_glasovi, detected_key)
     
-    print(check_parallel_intervals([[[5, 0], [1, 0], [2, 0], [1, 0]], [[4, 0], [0, 0], [2, 0], [1, 0]]]))
-    #generisano.show()
+    print(check_if_chords_exist(sve))
+    generisano.show()
 
 if __name__ == "__main__":
     main()

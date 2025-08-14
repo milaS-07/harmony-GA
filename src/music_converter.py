@@ -230,21 +230,24 @@ def build_full_score(soprano_part: stream.Part, other_voices_chrom: list, key_si
         part.append(key_signature)
 
     soprano_notes = list(soprano_part.notesAndRests)
-    for i, sop_note in enumerate(soprano_notes):
-        chroms = other_voices_chrom[i]
+    print(len(soprano_notes), len(other_voices_chrom))
 
-        for voice_idx in range(3):
-            chrom = chroms[voice_idx]
-
-            if isinstance(sop_note, note.Rest):
+    chrom_index = 0
+    for sop_note in soprano_notes:
+        if isinstance(sop_note, note.Rest):
+            for voice_idx in range(3):
                 new_note = note.Rest()
                 new_note.duration = sop_note.duration
-            else:
+                other_parts[voice_idx].append(new_note)
+        else:
+            chroms = other_voices_chrom[chrom_index]
+            for voice_idx in range(3):
+                chrom = chroms[voice_idx]
                 new_pitch = chromosome_to_tone(chrom, key_signature, tonic_pitch)
                 new_note = note.Note(new_pitch)
                 new_note.duration = sop_note.duration
-
-            other_parts[voice_idx].append(new_note)
+                other_parts[voice_idx].append(new_note)
+            chrom_index += 1
 
     for part in other_parts:
         full_score.append(part)

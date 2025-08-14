@@ -1,6 +1,15 @@
 from music21 import *
 from music_converter import chromosome_to_midi
 
+ALLOWED_TRIPLES = [
+    [0,2,4],
+    [1,3,5],
+    [2,4,6],
+    [1,3,6],
+    [2,4,7],
+    [0,3,5],
+    [1,4,6]
+]
 RANGES = [(53, 74), (48, 69), (41, 62)]
 # F - d1 -> bas
 # c - a1 -> tenor
@@ -129,3 +138,44 @@ def check_parallel_intervals(chromosome: list):
                 score -= penalty
 
     return score
+
+def check_if_chords_exist(chromosome: list):
+    if len(chromosome[0]) != 4:
+        raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
+    
+    reward = 15
+    score = 0
+    for moment in chromosome:
+        if check_if_chord(moment):
+            score += reward
+
+    return score
+
+
+
+def get_tone(tone: list):
+    return [tone[0] % 7, tone[1]]
+
+def check_if_chord(moment: list):
+    tones = [get_tone(tone)[0] for tone in moment]
+
+    for x in set(tones):
+        if tones.count(x) == 2:
+            the_rest = [y for y in tones if y != x]
+            if the_rest[0] != the_rest[1]:
+                return check_if_triad(tones) #TODO kasnije dodati provere i za ostale akorde
+
+    
+    return False
+
+def check_if_triad(tones: list):
+    tones.sort()
+
+    if tones[1] != tones[2]:
+        the_rest = list(set(tones))
+        the_rest.sort()
+
+        return the_rest in ALLOWED_TRIPLES
+
+
+    return False
