@@ -4,6 +4,7 @@ from score_utils import *
 from constraints import * #TODO obrisati kasnije
 from fitness import *
 from selection import *
+from crossover import *
 
 def main():
     broj = 13
@@ -16,7 +17,7 @@ def main():
 
     detected_key = sopran.analyze('key')
     
-    ostali_glasovi = generate_initial_population(sopran_chrom, detected_key, 10)#[0]
+    ostali_glasovi = generate_initial_population(sopran_chrom, detected_key, 5)#[0]
 
     # sve = combine_voices(sopran_chrom, ostali_glasovi)
 
@@ -27,10 +28,15 @@ def main():
 
     print(fitnesi)
 
-    fitnesi_novi = get_population_fitness(select_new_population(ostali_glasovi, fitnesi), sopran_chrom, detected_key)
+    izbor = select_new_population(ostali_glasovi, fitnesi)
+
+    fitnesi_novi = get_population_fitness(izbor, sopran_chrom, detected_key)
 
     print(fitnesi_novi)
-    #generisano.show()
+
+
+    generisano2 = build_full_score(sopran, izbor[0], detected_key)
+    generisano2.show()
 
 if __name__ == "__main__":
     main()
