@@ -176,15 +176,18 @@ def check_if_triad(tones: list):
 
     for i, allowed in enumerate(ALLOWED_TRIADS):
         if all(t in allowed for t in tones_set):
-            if i <= 2:
-                third_index = 1
-            elif 3 <= i <= 4:
-                third_index = 2
-            else:  # 5 <= idx <= 6
-                third_index = 0
+            third_index = get_third_index(i)
 
             third = allowed[third_index]
             count_third = sum(1 for t in tones if t == third)
             return count_third <= 1
 
     return False
+
+def get_third_index(num: int):
+    if num <= 2:
+        return 1
+    elif 3 <= num <= 4:
+        return 2
+    else:  # 5 <= idx <= 6
+       return 0

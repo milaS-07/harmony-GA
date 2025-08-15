@@ -1,7 +1,7 @@
 import random
 from music21 import *
 from music_converter import midi_to_chromosome, chromosome_to_midi
-from constraints import RANGES, ALLOWED_TRIADS, get_tone
+from constraints import RANGES, ALLOWED_TRIADS, get_tone, get_third_index
 
 
 def generate_initial_population(soprano: list, key: key.Key, num_population: int):
@@ -40,8 +40,8 @@ def generate_individual(soprano: list, key: key.Key):
 
                 if right_voice_ranges(tone, alteration, upper_limit, key) and \
                     (random.random() < 0.2 or right_voice_spacing(moment, tone, soprano[i]))  and \
-                    (random.random() < 0.2 or check_if_triad(soprano[i], moment + [[tone, alteration]])):
-                    if i == 0 or no_voice_overlap(tone, alteration, individual[i-1], j + 1, i, soprano):
+                    (random.random() < 0.2 or check_if_triad(soprano[i], moment + [[tone, alteration]])) and \
+                    (i == 0 or no_voice_overlap(tone, alteration, individual[i-1], j + 1, i, soprano)):
                         upper_limit = chromosome_to_midi([tone, alteration], key)
 
                         moment.append([tone, alteration])
@@ -97,5 +97,37 @@ def right_voice_spacing(moment: list, tone: int, soprano_moment: list):
     return True
 
 def check_if_triad(soprano_moment: list, current_moment: list):
-    possible_notes_for_triad = 0
+    possible_chords = ALLOWED_TRIADS.copy()
+
+    current_notes = [soprano_moment[0]] + [note[0] for note in current_moment]
+    current_notes = [get_tone([n, 0])[0] for n in current_notes]
+
+    for i, note in enumerate(current_notes):
+        possible_chords = [triad for triad in possible_chords if note in triad]
+        
+        new_possible_chords = []
+        for k, triad in enumerate(possible_chords):
+            third_idx = get_third_index(k)
+            terc = triad[third_idx]
+            other_notes = [triad[j] for j in range(3) if j != third_idx]
+            
+            if note == terc:
+                if current_notes.count(terc) > 1:
+                    continue
+            elif note in other_notes:
+                if current_notes.count(note) > 2:
+                    continue
+            
+            new_possible_chords.append(triad)
+        
+        possible_chords = new_possible_chords
+
+        if not possible_chords:
+            if i == len(current_notes) - 1:
+                return False
+            else:
+                return True
+
+
     return True
+    
