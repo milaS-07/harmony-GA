@@ -9,8 +9,8 @@ from crossover import *
 from mutation import *
 
 def main():
-    num_generation = 100
-    population_size = 100  
+    num_generation = 10
+    population_size = 10
 
     broj = 13
     korpus_cist = get_bach_corpus(broj)
@@ -27,18 +27,22 @@ def main():
     print(get_population_fitness(population, sopran_chrom, detected_key))
     print("---")
 
-    for _ in range(num_generation):
+    for _ in range(num_generation - 1):
         fitnesses = get_population_fitness(population, sopran_chrom, detected_key)
         population = select_new_population(population, fitnesses)
         fitnesses_after_selection = get_population_fitness(population, sopran_chrom, detected_key)
         print(fitnesses_after_selection)
         print("---")
-        random.shuffle(population) #valjda dobra ideja nmp
+        random.shuffle(population)
         population = do_crossover(population)
         population = mutate_population(population, detected_key)
 
     print("kraj")
-    print(fitnesses)
+    fitnesses = get_population_fitness(population, sopran_chrom, detected_key)
+    population = select_new_population(population, fitnesses)
+    fitnesses_after_selection = get_population_fitness(population, sopran_chrom, detected_key)
+    print(fitnesses_after_selection)
+    print("---")
 
 
     best_fitness_genereted = build_full_score(sopran, population[0], detected_key)

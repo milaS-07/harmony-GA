@@ -1,7 +1,7 @@
 from music21 import *
 from music_converter import chromosome_to_midi
 
-ALLOWED_TRIPLES = [
+ALLOWED_TRIADS = [
     [0,2,4],
     [1,3,5],
     [2,4,6],
@@ -169,13 +169,22 @@ def check_if_chord(moment: list):
     return False
 
 def check_if_triad(tones: list):
-    tones.sort()
+    tones_set = list(set(tones))
+    tones_set.sort()
+    if len(tones_set) != 3:
+        return False
 
-    if tones[1] != tones[2]:
-        the_rest = list(set(tones))
-        the_rest.sort()
+    for i, allowed in enumerate(ALLOWED_TRIADS):
+        if all(t in allowed for t in tones_set):
+            if i <= 2:
+                third_index = 1
+            elif 3 <= i <= 4:
+                third_index = 2
+            else:  # 5 <= idx <= 6
+                third_index = 0
 
-        return the_rest in ALLOWED_TRIPLES
-
+            third = allowed[third_index]
+            count_third = sum(1 for t in tones if t == third)
+            return count_third <= 1
 
     return False

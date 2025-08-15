@@ -1,7 +1,7 @@
 import random
 from music21 import *
 from music_converter import midi_to_chromosome, chromosome_to_midi
-from constraints import RANGES
+from constraints import RANGES, ALLOWED_TRIADS, get_tone
 
 
 def generate_initial_population(soprano: list, key: key.Key, num_population: int):
@@ -37,7 +37,10 @@ def generate_individual(soprano: list, key: key.Key):
                     break
 
                 tone = random.randint(down_chrom, up_chrom)
-                if right_voice_ranges(tone, alteration, upper_limit, key) and (right_voice_spacing(moment, tone, soprano[i]) or random.randint(0, 10) == 1):
+
+                if right_voice_ranges(tone, alteration, upper_limit, key) and \
+                    (random.random() < 0.2 or right_voice_spacing(moment, tone, soprano[i]))  and \
+                    (random.random() < 0.2 or check_if_triad(soprano[i], moment + [[tone, alteration]])):
                     if i == 0 or no_voice_overlap(tone, alteration, individual[i-1], j + 1, i, soprano):
                         upper_limit = chromosome_to_midi([tone, alteration], key)
 
@@ -91,4 +94,8 @@ def right_voice_spacing(moment: list, tone: int, soprano_moment: list):
         if soprano_moment[0] - tone > 7:
             return False
         
+    return True
+
+def check_if_triad(soprano_moment: list, current_moment: list):
+    possible_notes_for_triad = 0
     return True
