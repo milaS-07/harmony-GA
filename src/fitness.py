@@ -15,6 +15,8 @@ def get_individual_fitness(individual: list, soprano: list, key: key.Key):
     fitness += check_monotone_motion(voices_combined)
     fitness += check_voice_spacing(voices_combined)
     fitness += check_parallel_intervals(voices_combined)
-    fitness += check_if_chords_exist(voices_combined)
+    
+    score, chords = check_if_chords_exist(voices_combined, key)
+    fitness += score
 
     return fitness

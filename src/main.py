@@ -9,8 +9,8 @@ from crossover import *
 from mutation import *
 
 def main():
-    num_generation = 10
-    population_size = 10
+    num_generation = 1
+    population_size = 2
 
     broj = 13
     korpus_cist = get_bach_corpus(broj)

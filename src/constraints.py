@@ -139,19 +139,45 @@ def check_parallel_intervals(chromosome: list):
 
     return score
 
-def check_if_chords_exist(chromosome: list):
+def check_if_chords_exist(chromosome: list, key: key.Key):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
     reward = 15
     score = 0
+    chords = []
     for moment in chromosome:
         if check_if_chord(moment):
             score += reward
+            chord = identify_chord(moment, key)
+            chords.append(chord)
+        else:
+            chords.append(None)
 
-    return score
+    return score, chords
 
+def identify_chord(moment: list, key: key.Key): #TODO za mol proveriti koji je akord
+    tones = [get_tone(tone)[0] for tone in moment]
+    tones_set = list(set(tones))
+    tones_set.sort()
 
+    type_of_chord = -1 # 1 -> 5 3; 2 -> 6; 3 -> 6 4
+
+    chord_idx = ALLOWED_TRIADS.index(tones_set)
+    chord = ALLOWED_TRIADS[chord_idx]
+
+    third_idx = get_third_index(chord_idx)
+
+    bass = moment[3][0]
+
+    if bass == chord[third_idx]:
+        type_of_chord = 2
+    elif bass == chord[(third_idx + 1) % 3]:
+        type_of_chord = 3
+    elif bass == chord[(third_idx - 1) % 3]:
+        type_of_chord = 1
+
+    return chord_idx, type_of_chord
 
 def get_tone(tone: list):
     return [tone[0] % 7, tone[1]]
@@ -184,6 +210,12 @@ def check_if_triad(tones: list):
 
     return False
 
+def get_traid_index_from_third_index(third_index: int):
+    for num in range(len(ALLOWED_TRIADS)):
+        if get_third_index(num) == third_index:
+            return num
+
+
 def get_third_index(num: int):
     if num <= 2:
         return 1
@@ -191,3 +223,4 @@ def get_third_index(num: int):
         return 2
     else:  # 5 <= idx <= 6
        return 0
+    
