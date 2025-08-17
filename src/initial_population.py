@@ -106,15 +106,9 @@ def check_if_triad(soprano_moment: list, current_moment: list):
         possible_chords = [triad for triad in possible_chords if note in triad]
         
         new_possible_chords = []
-        for k, triad in enumerate(possible_chords):
-            third_idx = get_third_index(k)
-            terc = triad[third_idx]
-            other_notes = [triad[j] for j in range(3) if j != third_idx]
-            
-            if note == terc:
-                if current_notes.count(terc) > 1:
-                    continue
-            elif note in other_notes:
+        for triad in possible_chords:
+            notes = [triad[j] for j in range(3)]
+            if note in notes:
                 if current_notes.count(note) > 2:
                     continue
             
@@ -130,4 +124,6 @@ def check_if_triad(soprano_moment: list, current_moment: list):
 
 
     return True
+
+
     

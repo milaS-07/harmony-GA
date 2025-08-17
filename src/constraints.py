@@ -1,5 +1,6 @@
 from music21 import *
 from music_converter import chromosome_to_midi
+from collections import Counter
 
 ALLOWED_TRIADS = [
     [0,2,4],
@@ -139,45 +140,103 @@ def check_parallel_intervals(chromosome: list):
 
     return score
 
-def check_if_chords_exist(chromosome: list, key: key.Key):
+def check_if_chords_exist(chromosome: list, is_minor: bool):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    reward = 15
+    reward = 10
     score = 0
     chords = []
+    
     for moment in chromosome:
-        if check_if_chord(moment):
-            score += reward
-            chord = identify_chord(moment, key)
+        tones = [get_tone(tone)[0] for tone in moment]
+        tones.sort()
+        tones_set = list(set(tones))
+        tones_set.sort()
+
+        if tones_set in ALLOWED_TRIADS:
+            chord = identify_chord(tones_set, moment, is_minor)
             chords.append(chord)
+            if chord is not None:
+                score += reward
         else:
             chords.append(None)
 
     return score, chords
 
-def identify_chord(moment: list, key: key.Key): #TODO za mol proveriti koji je akord
+
+def identify_chord(chord: list, moment: list, is_minor: bool):
     tones = [get_tone(tone)[0] for tone in moment]
     tones_set = list(set(tones))
     tones_set.sort()
 
-    type_of_chord = -1 # 1 -> 5 3; 2 -> 6; 3 -> 6 4
+    if not verify_triad(moment, is_minor):
+        return None
 
+    return get_chord_info(moment, chord)
+
+#papir
+def verify_triad(moment: list, is_minor: bool):
+    steps_acc = [get_tone(t) for t in moment] 
+    
+    for tone, alteration in steps_acc:
+        if tone == 6:
+            if is_minor and alteration != 1:
+                return False
+            elif not is_minor and alteration != 0:
+                return False
+        else:
+            if alteration != 0:
+                return False
+            
+    tones = [get_tone(tone)[0] for tone in moment]
+    tones_set = sorted(set(tones))
+    
     chord_idx = ALLOWED_TRIADS.index(tones_set)
-    chord = ALLOWED_TRIADS[chord_idx]
+    
+    counts = Counter(tones)
+    repeated_tones = [t for t, c in counts.items() if c > 1]
+    if len(repeated_tones) != 1:
+        return False
 
-    third_idx = get_third_index(chord_idx)
+    repeated_tone = repeated_tones[0]
+    triad_step = get_triad_tone(repeated_tone, chord_idx)
 
-    bass = moment[3][0]
+    bass_tone = get_tone(moment[3])[0]
+    bass_step = get_triad_tone(bass_tone, chord_idx)
 
-    if bass == chord[third_idx]:
-        type_of_chord = 2
-    elif bass == chord[(third_idx + 1) % 3]:
-        type_of_chord = 3
-    elif bass == chord[(third_idx - 1) % 3]:
-        type_of_chord = 1
+    if bass_step == 1:
+        if chord_idx in [0, 3, 4]:
+            if triad_step not in [1, 5]:
+                return False
+        elif chord_idx in [1, 2, 5]:
+            if triad_step not in [1, 3]:
+                return False
+        else: #sedmi
+            if triad_step != 3:
+                return False
+    elif bass_step == 3:
+        if chord_idx in [0, 3, 4]:
+            if triad_step not in [1, 5]:
+                return False
+        elif chord_idx in [2, 5]:
+            if triad_step != 3:
+                return False
+        elif chord_idx == 6:
+            if triad_step not in [3, 5]:
+                return False
+    else:
+        if chord_idx in [0, 3, 4]:
+            if triad_step not in [1, 5]:
+                return False
+        else:
+            if triad_step != 3:
+                return False
 
-    return chord_idx, type_of_chord
+    return True
+            
+    
+
 
 def get_tone(tone: list):
     return [tone[0] % 7, tone[1]]
@@ -210,12 +269,6 @@ def check_if_triad(tones: list):
 
     return False
 
-def get_traid_index_from_third_index(third_index: int):
-    for num in range(len(ALLOWED_TRIADS)):
-        if get_third_index(num) == third_index:
-            return num
-
-
 def get_third_index(num: int):
     if num <= 2:
         return 1
@@ -224,3 +277,26 @@ def get_third_index(num: int):
     else:  # 5 <= idx <= 6
        return 0
     
+def get_triad_tone(tone: int, chord_idx: int):
+    chord = ALLOWED_TRIADS[chord_idx]
+    third_idx = get_third_index(chord_idx)
+
+    if tone == chord[third_idx]:
+        return 3
+    elif tone == chord[(third_idx + 1) % 3]:
+        return 5
+    elif tone == chord[(third_idx - 1) % 3]:
+        return 1
+    
+def get_chord_info(moment: list, chord: list):
+    chord_idx = ALLOWED_TRIADS.index(chord)
+    bass = get_tone(moment[3])[0]
+    bass_step = get_triad_tone(bass, chord_idx)
+
+    if bass_step == 1:
+        variation = 1
+    elif bass_step == 3:
+        variation = 2
+    else:
+        variation = 3
+    return chord_idx, variation
