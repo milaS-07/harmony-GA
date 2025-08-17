@@ -150,6 +150,7 @@ def check_if_chords_exist(chromosome: list, is_minor: bool):
     
     for moment in chromosome:
         tones = [get_tone(tone)[0] for tone in moment]
+
         tones.sort()
         tones_set = list(set(tones))
         tones_set.sort()
@@ -166,10 +167,6 @@ def check_if_chords_exist(chromosome: list, is_minor: bool):
 
 
 def identify_chord(chord: list, moment: list, is_minor: bool):
-    tones = [get_tone(tone)[0] for tone in moment]
-    tones_set = list(set(tones))
-    tones_set.sort()
-
     if not verify_triad(moment, is_minor):
         return None
 
@@ -195,8 +192,10 @@ def verify_triad(moment: list, is_minor: bool):
     chord_idx = ALLOWED_TRIADS.index(tones_set)
     
     counts = Counter(tones)
-    repeated_tones = [t for t, c in counts.items() if c > 1]
+    repeated_tones = [t for t, c in counts.items() if c == 2]
     if len(repeated_tones) != 1:
+        return False
+    if any(c > 2 for c in counts.values()):
         return False
 
     repeated_tone = repeated_tones[0]
@@ -241,33 +240,6 @@ def verify_triad(moment: list, is_minor: bool):
 def get_tone(tone: list):
     return [tone[0] % 7, tone[1]]
 
-def check_if_chord(moment: list):
-    tones = [get_tone(tone)[0] for tone in moment]
-
-    for x in set(tones):
-        if tones.count(x) == 2:
-            the_rest = [y for y in tones if y != x]
-            if the_rest[0] != the_rest[1]:
-                return check_if_triad(tones) #TODO kasnije dodati provere i za ostale akorde
-
-    
-    return False
-
-def check_if_triad(tones: list):
-    tones_set = list(set(tones))
-    tones_set.sort()
-    if len(tones_set) != 3:
-        return False
-
-    for i, allowed in enumerate(ALLOWED_TRIADS):
-        if all(t in allowed for t in tones_set):
-            third_index = get_third_index(i)
-
-            third = allowed[third_index]
-            count_third = sum(1 for t in tones if t == third)
-            return count_third <= 1
-
-    return False
 
 def get_third_index(num: int):
     if num <= 2:
