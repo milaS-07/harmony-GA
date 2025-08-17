@@ -9,8 +9,8 @@ from crossover import *
 from mutation import *
 
 def main():
-    num_generation = 2
-    population_size = 2
+    num_generation = 10
+    population_size = 10
 
     broj = 5
     korpus_cist = get_bach_corpus(broj)
@@ -40,12 +40,13 @@ def main():
     print("kraj")
     fitnesses = get_population_fitness(population, sopran_chrom, detected_key)
     population = select_new_population(population, fitnesses)
+    print("~~~")
     fitnesses_after_selection = get_population_fitness(population, sopran_chrom, detected_key)
     print(fitnesses_after_selection)
 
 
     best_fitness_genereted = build_full_score(sopran, population[0], detected_key)
-    best_fitness_genereted.show()
+    #best_fitness_genereted.show()
 
 if __name__ == "__main__":
     main()

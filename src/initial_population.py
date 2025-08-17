@@ -1,7 +1,9 @@
+from collections import Counter
 import random
 from music21 import *
 from music_converter import midi_to_chromosome, chromosome_to_midi
-from constraints import RANGES, ALLOWED_TRIADS, get_tone, get_third_index
+from constraints import RANGES, ALLOWED_TRIADS, get_tone, verify_triad
+import itertools
 
 
 def generate_initial_population(soprano: list, key: key.Key, num_population: int):
@@ -40,7 +42,7 @@ def generate_individual(soprano: list, key: key.Key):
 
                 if right_voice_ranges(tone, alteration, upper_limit, key) and \
                     (random.random() < 0.2 or right_voice_spacing(moment, tone, soprano[i]))  and \
-                    (random.random() < 0.1 or check_if_triad(soprano[i], moment + [[tone, alteration]])) and \
+                    (random.random() < 0.02 or check_if_triad(soprano[i], moment + [[tone, alteration]], key)) and \
                     (i == 0 or no_voice_overlap(tone, alteration, individual[i-1], j + 1, i, soprano)):
                         upper_limit = chromosome_to_midi([tone, alteration], key)
 
@@ -96,34 +98,63 @@ def right_voice_spacing(moment: list, tone: int, soprano_moment: list):
         
     return True
 
-def check_if_triad(soprano_moment: list, current_moment: list):
+def check_if_triad(soprano_moment: list, current_moment: list, key: key.Key):
     possible_chords = ALLOWED_TRIADS.copy()
 
     current_notes = [soprano_moment[0]] + [note[0] for note in current_moment]
     current_notes = [get_tone([n, 0])[0] for n in current_notes]
 
-    for i, note in enumerate(current_notes):
-        possible_chords = [triad for triad in possible_chords if note in triad]
-        
-        new_possible_chords = []
-        for triad in possible_chords:
-            notes = [triad[j] for j in range(3)]
-            if note in notes:
-                if current_notes.count(note) > 2:
-                    continue
-            
-            new_possible_chords.append(triad)
-        
-        possible_chords = new_possible_chords
+    is_minor = key.mode == 'minor'
 
-        if not possible_chords:
-            if i == len(current_notes) - 1:
-                return False
-            else:
+    counts = Counter(current_notes)
+    repeated_tones = [t for t, c in counts.items() if c > 1]
+
+
+    if len(current_notes) == 4:
+        if len(repeated_tones) != 1 or any(c > 2 for c in counts.values()):
+            return False #or not i == len(current_notes) - 1
+        
+        unique_notes = sorted(set(current_notes))
+        if unique_notes not in ALLOWED_TRIADS:
+            return False
+        
+        moment_for_verify = [[n, 0] for n in current_notes]
+        return verify_triad(moment_for_verify, is_minor)
+
+    counts = Counter(current_notes)
+    repeated_tones = [t for t, c in counts.items() if c > 1]
+    if len(repeated_tones) > 1 or any(c > 2 for c in counts.values()):
+        return False
+
+
+    to_continue = False
+    current_notes_temp = current_notes[:-1]
+    for triad in ALLOWED_TRIADS:
+        if not set(current_notes_temp).issubset(triad):
+            continue
+        for combo in itertools.product(triad, repeat=(4 - len(current_notes_temp))):
+            full_moment = current_notes_temp + list(combo)
+            if len(set(full_moment)) != 3:
+                continue
+            moment_for_verify = [[n, 0] for n in full_moment]
+            if verify_triad(moment_for_verify, is_minor):
+                to_continue = True
+                break
+
+    if not to_continue:
+        return True
+
+    for triad in ALLOWED_TRIADS:
+        if not set(current_notes).issubset(triad):
+            continue
+        for combo in itertools.product(triad, repeat=(4 - len(current_notes))):
+            full_moment = current_notes + list(combo)
+            if len(set(full_moment)) != 3:
+                continue
+            moment_for_verify = [[n, 0] for n in full_moment]
+            if verify_triad(moment_for_verify, is_minor):
                 return True
 
 
-    return True
-
-
+    return False
     

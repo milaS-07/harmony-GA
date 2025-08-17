@@ -240,7 +240,6 @@ def verify_triad(moment: list, is_minor: bool):
 def get_tone(tone: list):
     return [tone[0] % 7, tone[1]]
 
-
 def get_third_index(num: int):
     if num <= 2:
         return 1
