@@ -152,11 +152,14 @@ def chromosome_to_midi(tone: list, key: key.Key):
     scale = key.getScale()
     target_pitch = scale.pitchFromDegree((degree_offset % 7) + 1)
 
+    
+    if target_pitch.octave < tonic_pitch.octave:
+        #print("joj")
+        target_pitch.octave += 1
+
     octave_shift = degree_offset // 7
     target_pitch.octave += octave_shift
 
-    if tonic_pitch.octave == 3:
-        target_pitch.octave -= 1
 
     target_pitch = target_pitch.transpose(alteration)
 

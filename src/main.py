@@ -9,10 +9,10 @@ from crossover import *
 from mutation import *
 
 def main():
-    num_generation = 10
-    population_size = 10
+    num_generation = 1
+    population_size = 2
 
-    broj = 5
+    broj = 3
     korpus_cist = get_bach_corpus(broj)
 
     korpus = get_clean_harmony(korpus_cist)
@@ -46,7 +46,7 @@ def main():
 
 
     best_fitness_genereted = build_full_score(sopran, population[0], detected_key)
-    #best_fitness_genereted.show()
+    best_fitness_genereted.show()
 
 if __name__ == "__main__":
     main()

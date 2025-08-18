@@ -25,9 +25,9 @@ def check_voice_range(chromosome: list, key: key.Key):
         for i, tone in enumerate(moment):
             curr_midi = chromosome_to_midi(tone, key)
             if curr_midi > RANGES[i][1]:
-                score -= curr_midi - RANGES[i][1]
+                score -= (curr_midi - RANGES[i][1])
             elif curr_midi < RANGES[i][0]:
-                score -= RANGES[i][0] - curr_midi
+                score -= (RANGES[i][0] - curr_midi)
 
     return score
 
@@ -35,7 +35,7 @@ def check_voice_crossing(chromosome: list):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    penalty = 5
+    penalty = 4
     score = 0
 
     for moment in chromosome:
@@ -53,7 +53,7 @@ def check_voice_overlap(chromosome: list):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    penalty = 5
+    penalty = 3
     score = 0
 
     for i, moment in enumerate(chromosome[:-1]):
@@ -86,7 +86,7 @@ def check_monotone_motion(chromosome: list):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    penalty = 3
+    penalty = 2
     score = 0
     for i, curr in enumerate(chromosome[1:]):
         prev = chromosome[i]
@@ -105,7 +105,7 @@ def check_voice_spacing(chromosome: list):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    penalty = 4
+    penalty = 3
     score = 0
     for moment in chromosome:
         for i, tone in enumerate(moment[:-2]):
@@ -121,7 +121,7 @@ def check_parallel_intervals(chromosome: list):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    penalty = 5
+    penalty = 4
     score = 0
     for i, moment in enumerate(chromosome[:-1]):
         for j, voice in enumerate(moment[:-1]):
