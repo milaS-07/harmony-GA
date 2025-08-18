@@ -21,6 +21,9 @@ def main():
     sopran = get_soprano(korpus)
     sopran_chrom = soprano_to_chromosome(sopran)
 
+    print(get_beat_strengths(sopran))
+    sopran.show()
+
     detected_key = sopran.analyze('key')
     
     population = generate_initial_population(sopran_chrom, detected_key, population_size)

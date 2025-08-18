@@ -1,5 +1,14 @@
 from music21 import *
+import math
 
+default_patterns = { #TODO treba bolje resenje
+    2: [3,1],
+    3: [3,1,1],
+    4: [3,1,2,1],
+    5: [3,1,1,1,1],
+    6: [3,1,1,2,1,1],
+    9: [3,1,1,2,1,1,2,1,1],
+}
 
 def soprano_to_chromosome(soprano: stream.Score):
     chromosome = []
@@ -173,7 +182,6 @@ def midi_to_chromosome(midi: int, key: key.Key):
     chrom = tone_to_chromosome(n, key, tonic_pitch)
     return chrom
 
-
 def combine_voices(soprano: list, three_voices: list):
     all = []
     for i in range(len(soprano)):
@@ -257,3 +265,19 @@ def build_full_score(soprano_part: stream.Part, other_voices_chrom: list, key_si
         full_score.append(part)
 
     return full_score
+
+def get_beat_strengths(soprano_part: stream.Part):
+    # uzimamo numerator prvog time signature-a (ili 4 ako ga nema)
+    ts = soprano_part.recurse().getElementsByClass('TimeSignature')
+    numerator = ts[0].numerator if ts else 4
+
+    pattern = default_patterns.get(numerator, [1]*numerator)
+
+    beat_strengths = []
+    for n in soprano_part.notes:  # bez flatten()
+        # umesto n.beat, koristimo offset u odnosu na takt (mod numerator)
+        beat_index = int(n.offset) % numerator
+        strength = pattern[beat_index % len(pattern)]
+        beat_strengths.append(strength)
+
+    return beat_strengths
