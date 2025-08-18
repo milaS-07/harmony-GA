@@ -38,9 +38,6 @@ def generate_individual(soprano: list, key: key.Key):
 
                     moment.append([down_chrom, alteration])
                     
-                    print(midi_to_chromosome(voice_low, key))
-                    print(midi_to_chromosome(voice_high, key))
-                    print(down_chrom, up_chrom, upper_limit)
                     break
 
                 tone = random.randint(down_chrom, up_chrom)

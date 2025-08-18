@@ -12,10 +12,11 @@ def main():
     num_generation = 1
     population_size = 2
 
-    broj = 5
+    broj = 7
     korpus_cist = get_bach_corpus(broj)
 
     korpus = get_clean_harmony(korpus_cist)
+
 
     sopran = get_soprano(korpus)
     sopran_chrom = soprano_to_chromosome(sopran)

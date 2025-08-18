@@ -11,16 +11,16 @@ def get_individual_fitness(individual: list, soprano: list, key: key.Key):
 
     is_minor = key.mode == 'minor'
 
-    # fitness += check_voice_range(individual, key)
-    # fitness += check_voice_crossing(voices_combined)
-    # fitness += check_voice_overlap(voices_combined)
-    # fitness += check_monotone_motion(voices_combined)
-    # fitness += check_voice_spacing(voices_combined)
-    # fitness += check_parallel_intervals(voices_combined)
+    fitness += check_voice_range(individual, key)
+    fitness += check_voice_crossing(voices_combined)
+    fitness += check_voice_overlap(voices_combined)
+    fitness += check_monotone_motion(voices_combined)
+    fitness += check_voice_spacing(voices_combined)
+    fitness += check_parallel_intervals(voices_combined)
     
-    score, chords = check_if_chords_exist(voices_combined, is_minor)
-    fitness += score
+    # score, chords = check_if_chords_exist(voices_combined, is_minor)
+    # fitness += score
 
-    print(chords)
+    # print(chords)
 
     return fitness
