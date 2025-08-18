@@ -12,7 +12,7 @@ def main():
     num_generation = 1
     population_size = 2
 
-    broj = 3
+    broj = 5
     korpus_cist = get_bach_corpus(broj)
 
     korpus = get_clean_harmony(korpus_cist)

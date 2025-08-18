@@ -146,19 +146,20 @@ def score_to_chromosome(score):
 
 def chromosome_to_midi(tone: list, key: key.Key):
     degree_offset, alteration = tone
+
+    note_order = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
     
     tonic_pitch = get_tonic_pitch(key)
 
     scale = key.getScale()
     target_pitch = scale.pitchFromDegree((degree_offset % 7) + 1)
 
-    
-    if target_pitch.octave < tonic_pitch.octave:
-        #print("joj")
-        target_pitch.octave += 1
+    octave_shift = 0
+    if note_order.index(target_pitch.step) < note_order.index(tonic_pitch.step):
+       octave_shift += 1
 
-    octave_shift = degree_offset // 7
-    target_pitch.octave += octave_shift
+    octave_shift += degree_offset // 7
+    target_pitch.octave = tonic_pitch.octave + octave_shift
 
 
     target_pitch = target_pitch.transpose(alteration)
@@ -255,4 +256,3 @@ def build_full_score(soprano_part: stream.Part, other_voices_chrom: list, key_si
         full_score.append(part)
 
     return full_score
-    
