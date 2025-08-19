@@ -9,10 +9,10 @@ from crossover import *
 from mutation import *
 
 def main():
-    num_generation = 1
-    population_size = 2
+    num_generation = 10
+    population_size = 10
 
-    broj = 7
+    broj = 5
     korpus_cist = get_bach_corpus(broj)
 
     korpus = get_clean_harmony(korpus_cist)
@@ -21,20 +21,19 @@ def main():
     sopran = get_soprano(korpus)
     sopran_chrom = soprano_to_chromosome(sopran)
 
-    print(get_beat_strengths(sopran))
-    sopran.show()
+    beat_strengths = get_beat_strengths(sopran)
 
     detected_key = sopran.analyze('key')
     
     population = generate_initial_population(sopran_chrom, detected_key, population_size)
 
-    print(get_population_fitness(population, sopran_chrom, detected_key))
+    print(get_population_fitness(population, sopran_chrom, detected_key, beat_strengths))
     print("---")
 
     for _ in range(num_generation - 1):
-        fitnesses = get_population_fitness(population, sopran_chrom, detected_key)
+        fitnesses = get_population_fitness(population, sopran_chrom, detected_key, beat_strengths)
         population = select_new_population(population, fitnesses)
-        fitnesses_after_selection = get_population_fitness(population, sopran_chrom, detected_key)
+        fitnesses_after_selection = get_population_fitness(population, sopran_chrom, detected_key, beat_strengths)
         print(fitnesses_after_selection)
         print("---")
         random.shuffle(population)
@@ -42,10 +41,10 @@ def main():
         population = mutate_population(population, detected_key)
 
     print("kraj")
-    fitnesses = get_population_fitness(population, sopran_chrom, detected_key)
+    fitnesses = get_population_fitness(population, sopran_chrom, detected_key, beat_strengths)
     population = select_new_population(population, fitnesses)
     print("~~~")
-    fitnesses_after_selection = get_population_fitness(population, sopran_chrom, detected_key)
+    fitnesses_after_selection = get_population_fitness(population, sopran_chrom, detected_key, beat_strengths)
     print(fitnesses_after_selection)
 
 

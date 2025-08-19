@@ -165,6 +165,24 @@ def check_if_chords_exist(chromosome: list, is_minor: bool):
 
     return score, chords
 
+def check_starting_chord(starting_chord: list):
+    if starting_chord == (0, 1):
+        return 4
+    elif starting_chord == (3, 1) or starting_chord == (4, 1):
+        return 2
+    
+    return -3
+
+def check_function_transfer(chords: list, beat_strengths: list):
+    score = 0
+    penalty = 3
+
+    for i, chord in enumerate(chords[:-1]):
+        if beat_strengths[i] == 1 and beat_strengths[i+1] == 3 and \
+        chord == chords[i+1]:
+            score -= penalty
+
+    return score
 
 def identify_chord(chord: list, moment: list, is_minor: bool):
     if not verify_triad(moment, is_minor):
@@ -234,8 +252,6 @@ def verify_triad(moment: list, is_minor: bool):
 
     return True
             
-    
-
 
 def get_tone(tone: list):
     return [tone[0] % 7, tone[1]]
