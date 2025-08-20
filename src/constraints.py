@@ -16,6 +16,14 @@ RANGES = [(53, 74), (48, 69), (41, 62)]
 # c - a1 -> tenor
 # f - d2 -> alt
 
+CHORD_FREQUENCY = {
+    1: [(0, 1), (3, 1), (4, 1)],
+    2: [(0, 2), (3, 2), (4, 2), (5, 1), (1, 2), (0, 3)],
+    3: [(3, 3), (4, 3), (1, 1)],
+    4: [(1, 3), (6, 2)],
+    5: [(2, 1), (2, 2), (2, 3), (5, 2), (5, 3), (6, 1), (6, 3)]
+}
+
 def check_voice_range(chromosome: list, key: key.Key):
     if len(chromosome[0]) != 3:
         raise ValueError(f"Expected moment of length 3, got {len(chromosome[0])}")
@@ -286,6 +294,21 @@ def check_if_right_fifth_sixth_tone_progression(chords: list, chromosome: list):
             else:
                 score -= penalty
 
+    return score
+
+def check_chord_frequency(chords: list):
+    score = 0
+    for chord in chords:
+        if chord is None:
+            continue
+
+        for freq_rank, chord_list in CHORD_FREQUENCY.items():
+            if chord in chord_list:
+                bonus = 2 ** (6 - freq_rank)
+                if bonus > 10:
+                    bonus = 10
+                score += int(bonus)
+                break
     return score
 
 def identify_chord(chord: list, moment: list, is_minor: bool):
