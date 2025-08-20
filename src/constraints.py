@@ -266,11 +266,43 @@ def check_forbidden_chord_progression(chords: list, beat_strengths: list):
 
     return score
 
+def check_if_right_fifth_sixth_tone_progression(chords: list, chromosome: list):
+    if len(chromosome[0]) != 4:
+        raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
+    
+    score = 0
+    reward = 5
+    penalty = 4   
+
+    for i, chord1 in enumerate(chords[:-1]):
+        chord2 = chords[i+1]
+
+        if (chord1 == (4, 1) and chord2 == (5, 1)) or \
+           (chord1 == (5, 1) and chord2 == (4, 1)):
+            idx = i if chord1 == (5, 1) else i+1
+
+            if is_the_third_repeated(chromosome[idx], 5):
+                score += reward
+            else:
+                score -= penalty
+
+    return score
+
 def identify_chord(chord: list, moment: list, is_minor: bool):
     if not verify_triad(moment, is_minor):
         return None
 
     return get_chord_info(moment, chord)
+
+
+def is_the_third_repeated(moment: list, chord_idx: int):
+    third_idx = get_third_index(chord_idx)
+    third_num = ALLOWED_TRIADS[chord_idx][third_idx]
+
+    count = sum(1 for note in moment if note[0] == third_num)
+
+    return count == 2
+
 
 #papir
 def verify_triad(moment: list, is_minor: bool):
