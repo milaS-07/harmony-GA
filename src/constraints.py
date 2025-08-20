@@ -167,11 +167,37 @@ def check_if_chords_exist(chromosome: list, is_minor: bool):
 
 def check_starting_chord(starting_chord: list):
     if starting_chord == (0, 1):
-        return 4
+        return 12
     elif starting_chord == (3, 1) or starting_chord == (4, 1):
-        return 2
+        return 8
     
-    return -3
+    return -15
+
+def check_final_cadence(chords: list):
+    if len(chords) < 4:
+        return 0
+
+    score = 0
+    reward = 12
+    penelty = 20
+
+    if chords[-1] == (0, 1):
+        score += reward
+    else:
+        score -= penelty
+
+    if chords[-2] == (4, 1):
+        score += 7
+        if chords[-3] == (3, 1) or chords[-3] == (1, 2):
+            score += 4
+        elif chords[-3] == (0, 3):
+            score += 4
+            if chords[-4] == (1, 2) or chords[-4] == (3, 1):
+                score += 2
+    elif chords[-2] == (3, 1):
+        score += 5
+
+    return score
 
 def check_function_transfer(chords: list, beat_strengths: list):
     score = 0
