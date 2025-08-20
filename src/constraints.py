@@ -210,6 +210,37 @@ def check_function_transfer(chords: list, beat_strengths: list):
 
     return score
 
+def check_if_allowed_intervals(chromosome: list, key: key.Key):
+    if len(chromosome[0]) != 3:
+        raise ValueError(f"Expected moment of length 3, got {len(chromosome[0])}")
+    
+    score = 0
+    penelty = 5
+
+    for voice_index in range(3):
+        for i in range(2):
+            tone1 = chromosome[i][voice_index]
+            tone2 = chromosome[i+1][voice_index]
+            if not check_if_allowed_distance(tone1, tone2, key):
+                score -= penelty
+    return score
+
+def check_if_violates_double_jump_dissonance(chromosome: list, key: key.Key):
+    if len(chromosome[0]) != 3:
+        raise ValueError(f"Expected moment of length 3, got {len(chromosome[0])}")
+    
+    score = 0
+    penelty = 5
+
+    for voice_index in range(3):
+        for i,_ in enumerate(chromosome[:-2]):
+            tone1 = chromosome[i][voice_index]
+            tone2 = chromosome[i+1][voice_index]
+            tone3 = chromosome[i+2][voice_index]
+            if check_if_dissonance(tone1, tone2, tone3, key):
+                score -= penelty
+    return score
+
 def identify_chord(chord: list, moment: list, is_minor: bool):
     if not verify_triad(moment, is_minor):
         return None
@@ -278,7 +309,6 @@ def verify_triad(moment: list, is_minor: bool):
 
     return True
             
-
 def get_tone(tone: list):
     return [tone[0] % 7, tone[1]]
 
@@ -313,3 +343,39 @@ def get_chord_info(moment: list, chord: list):
     else:
         variation = 3
     return chord_idx, variation
+
+def check_if_allowed_distance(tone1: list, tone2: list, key: key.Key):
+    t1, t2 = tone1[0], tone2[0]
+    t1_midi, t2_midi = chromosome_to_midi(tone1, key), chromosome_to_midi(tone2, key)
+    midi_difference = abs(t1_midi - t2_midi)
+    note_difference = abs(t1 - t2)
+
+    if (midi_difference == 6 and note_difference == 3) or \
+       (midi_difference == 8 and note_difference == 4) or \
+       (midi_difference == 3 and note_difference == 1):
+        return False
+
+    return True
+
+def check_if_dissonance(tone1: list, tone2: list, tone3: list, key: key.Key):
+    t1, t2, t3 = tone1[0], tone2[0], tone3[0]
+    t1_midi = chromosome_to_midi(tone1, key)
+    t2_midi = chromosome_to_midi(tone2, key)
+    t3_midi = chromosome_to_midi(tone3, key)
+
+    midi_difference12 = abs(t1_midi - t2_midi)
+    midi_difference23 = abs(t2_midi - t3_midi)
+
+    note_difference12 = abs(t1 - t2)
+    note_difference23 = abs(t2 - t3)
+    note_difference13 = abs(t1 - t3)
+
+    if (note_difference12 == 2 and note_difference23 == 2 and note_difference13 == 4 and \
+        midi_difference12 == 4 and midi_difference23 == 4) or \
+        (note_difference12 == 3 and note_difference23 == 3 and note_difference13 == 6 and \
+        midi_difference12 == 5 and midi_difference23 == 5) or \
+        (note_difference12 == 4 and note_difference23 == 4 and note_difference13 == 8 and \
+        midi_difference12 == 7 and midi_difference23 == 7):
+        return True
+    
+    return False
