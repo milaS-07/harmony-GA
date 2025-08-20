@@ -42,6 +42,7 @@ def get_individual_fitness(individual: list, soprano: list, key: key.Key, beat_s
     fitness += check_final_cadence(chords)
     fitness += check_if_allowed_intervals(individual, key)
     fitness += check_if_violates_double_jump_dissonance(individual, key)
+    fitness += check_forbidden_chord_progression(chords, beat_strengths)
 
     formated = ", ".join(
         f"{func_map[chord[0]]}{inversion_map[chord[1]]}" if chord is not None else "None"

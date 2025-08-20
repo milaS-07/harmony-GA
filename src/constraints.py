@@ -241,6 +241,31 @@ def check_if_violates_double_jump_dissonance(chromosome: list, key: key.Key):
                 score -= penelty
     return score
 
+def check_forbidden_chord_progression(chords: list, beat_strengths: list):
+    score = 0
+    penalty = 5
+
+    for i, chord1 in enumerate(chords[:-1]):
+        chord2 = chords[i+1]
+        if (chord1 == (4, 1) and chord2 == (3, 1)) or \
+           (chord1 == (4, 2) and chord2 == (3, 1)) or \
+           (chord1 == (5, 1) and chord2 == (0, 1)) or \
+           (chord1 == (1, 1) and chord2 == (3, 1)) or \
+           (chord1 == (4, 1) and chord2 == (1, 1)) or \
+           (chord1 == (6, 1) and chord2 != (0, 1)) or \
+           (chord1 == (0, 3) and chord2 != (4, 1)):
+            score -= penalty
+        elif chord1 == (0, 3) and chord2 == (4, 1) and (beat_strengths[i] == 1 or beat_strengths[i+1] > 1):
+            score -= 2
+
+    for i, chord1 in enumerate(chords[:-2]):
+        chord2 = chords[i+1]
+        chord3 = chords[i+2]
+        if chord1 == (4, 1) and chord2 == (1, 1) and chord3 == (4, 1):
+            score += penalty
+
+    return score
+
 def identify_chord(chord: list, moment: list, is_minor: bool):
     if not verify_triad(moment, is_minor):
         return None
