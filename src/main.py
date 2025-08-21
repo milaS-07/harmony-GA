@@ -9,8 +9,8 @@ from crossover import *
 from mutation import *
 
 def main():
-    num_generation = 40
-    population_size = 40
+    num_generation = 10
+    population_size = 10
 
     broj = 5
     korpus_cist = get_bach_corpus(broj)
@@ -27,7 +27,6 @@ def main():
     fitnesses = get_population_fitness(
         population, sopran_chrom, detected_key, beat_strengths, generation_idx=0
     )
-    # formatiranje za print
     fitnesses_rounded = [round(f, 1) for f in fitnesses]
     print(fitnesses_rounded)
     print("---")
@@ -41,7 +40,6 @@ def main():
         fitnesses_after_selection = get_population_fitness(
             population, sopran_chrom, detected_key, beat_strengths, generation_idx=gen_idx
         )
-        # formatiranje za print
         fitnesses_after_selection_rounded = [round(f, 1) for f in fitnesses_after_selection]
         print(fitnesses_after_selection_rounded)
         print("---")
@@ -59,7 +57,6 @@ def main():
     fitnesses_after_selection = get_population_fitness(
         population, sopran_chrom, detected_key, beat_strengths, generation_idx=num_generation - 1
     )
-    # formatiranje za print
     fitnesses_after_selection_rounded = [round(f, 1) for f in fitnesses_after_selection]
     print(fitnesses_after_selection_rounded)
     

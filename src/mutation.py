@@ -4,7 +4,7 @@ from music_converter import chromosome_to_midi
 from constraints import RANGES, get_tone
 
 def mutate_population(population: list, key: key.Key):
-    mutation_rate = 0.01
+    mutation_rate = 0.007
 
     new_population = []
 

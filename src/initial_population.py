@@ -48,8 +48,9 @@ def generate_individual(soprano: list, key: key.Key):
 
                 if right_voice_ranges(tone, alteration, upper_limit, key) and \
                     (random.random() < 0.15 or right_voice_spacing(moment, tone, soprano[i]))  and \
-                    (random.random() < 0.01 or check_if_triad(soprano[i], moment + [[tone, alteration]], key)) and \
-                    (i == 0 or no_voice_overlap(tone, alteration, individual[i-1], j + 1, i, soprano)):
+                    (i == len(soprano) - 1 or random.random() < 0.01 or check_if_triad(soprano[i], moment + [[tone, alteration]], key)) and \
+                    (i == 0 or no_voice_overlap(tone, alteration, individual[i-1], j + 1, i, soprano)) and \
+                    (i != len(soprano) - 1 or random.random() < 0.05 or check_ending_chord(moment + [[tone, alteration]], soprano[i])):
                         upper_limit = chromosome_to_midi([tone, alteration], key)
 
                         moment.append([tone, alteration])
@@ -172,4 +173,24 @@ def check_if_triad(soprano_moment: list, current_moment: list, key: key.Key):
 
 
     return False
+    
+def check_ending_chord(last_moment: list, last_soprano: list): #TODO da radi cesce ne razumem zasto ne
+    notes = [get_tone(last_soprano)[0]] + [get_tone(note)[0] for note in last_moment]
+    
+    required = [0, 2, 4]
+    seen = set()
+
+    for i, n in enumerate(notes):
+        if len(notes) == 4 and i == 3:
+            if notes[3] == 0:
+                return True
+            else:
+                return False
+
+        if n not in required or n in seen:
+            return i != len(notes) - 1
+        seen.add(n)
+
+    return True
+        
     

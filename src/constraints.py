@@ -171,19 +171,19 @@ def check_if_chords_exist(chromosome: list, is_minor: bool):
 
 def check_starting_chord(starting_chord: list):
     if starting_chord == (0, 1):
-        return 8
-    elif starting_chord == (3, 1) or starting_chord == (4, 1):
         return 6
+    elif starting_chord == (3, 1) or starting_chord == (4, 1):
+        return 4
     
-    return -10
+    return -8
 
 def check_final_cadence(chords: list):
     if len(chords) < 4:
         return 0
 
     score = 0
-    reward = 8
-    penelty = 10
+    reward = 7
+    penelty = 9
 
     if chords[-1] == (0, 1):
         score += reward
@@ -191,7 +191,7 @@ def check_final_cadence(chords: list):
         score -= penelty
 
     if chords[-2] == (4, 1):
-        score += 6
+        score += 5
         if chords[-3] == (3, 1) or chords[-3] == (1, 2):
             score += 2
         elif chords[-3] == (0, 3):
@@ -301,8 +301,8 @@ def check_chord_frequency(chords: list):
         for freq_rank, chord_list in CHORD_FREQUENCY.items():
             if chord in chord_list:
                 bonus = 2 ** (6 - freq_rank)
-                if bonus > 10:
-                    bonus = 10
+                if bonus > 20:
+                    bonus = 20
                 score += int(bonus)
                 break
     return score / len(chords)
