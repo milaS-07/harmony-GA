@@ -9,7 +9,7 @@ from crossover import *
 from mutation import *
 
 def main():
-    num_generation = 3
+    num_generation = 10
     population_size = 10
 
     broj = 5
@@ -53,13 +53,13 @@ def main():
     population = select_new_population(population, fitnesses)
     print("~~~")
     fitnesses_after_selection = get_population_fitness(
-        population, sopran_chrom, detected_key, beat_strengths, generation_idx=num_generation + 1
+        population, sopran_chrom, detected_key, beat_strengths, generation_idx=num_generation
     )
     print(fitnesses_after_selection)
 
     # --- Najbolja jedinka ---
-    best_fitness_genereted = build_full_score(sopran, population[0], detected_key)
-    best_fitness_genereted.show()
+    #best_fitness_genereted = build_full_score(sopran, population[0], detected_key)
+    #best_fitness_genereted.show()
 
 
 if __name__ == "__main__":

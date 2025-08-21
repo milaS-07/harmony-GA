@@ -5,7 +5,6 @@ def select_new_population(population: list, fitnesses: list):
     num_elite = max(1, int(pop_size * 0.1))
 
     sorted_indices = sorted(range(len(fitnesses)), key=lambda i: fitnesses[i], reverse=True)
-    
     elite_indices = sorted_indices[:num_elite]
     elite_individuals = [population[i] for i in elite_indices]
 
@@ -13,11 +12,7 @@ def select_new_population(population: list, fitnesses: list):
     remaining_population = [population[i] for i in remaining_indices]
     remaining_fitnesses = [fitnesses[i] for i in remaining_indices]
 
-    
-    num_to_select = pop_size - num_elite
-    min_fitness = min(remaining_fitnesses, default=0)
-    if min_fitness < 0:
-        remaining_fitnesses = [f - min_fitness + 1 for f in remaining_fitnesses]
+    remaining_fitnesses = normalize_fitness(remaining_fitnesses)
 
     total_fitness = sum(remaining_fitnesses)
     if total_fitness == 0:
@@ -25,6 +20,7 @@ def select_new_population(population: list, fitnesses: list):
     else:
         probabilities = [f / total_fitness for f in remaining_fitnesses]
 
+    num_to_select = pop_size - num_elite
     selected_individuals = []
     for _ in range(num_to_select):
         r = random.random()
@@ -36,3 +32,11 @@ def select_new_population(population: list, fitnesses: list):
                 break
 
     return elite_individuals + selected_individuals
+
+
+def normalize_fitness(fitnesses):
+    f_min = min(fitnesses)
+    f_max = max(fitnesses)
+    if f_max == f_min:
+        return [1 for _ in fitnesses]
+    return [(f - f_min) / (f_max - f_min) for f in fitnesses]

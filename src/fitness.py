@@ -20,6 +20,11 @@ inversion_map = {
 }
 
 LOG_DIR = "logs"
+
+if os.path.exists(LOG_DIR):
+    import shutil
+    shutil.rmtree(LOG_DIR)
+
 os.makedirs(LOG_DIR, exist_ok=True)
 
 def save_generation_log(generation_idx: int, population_data: list):
@@ -28,9 +33,7 @@ def save_generation_log(generation_idx: int, population_data: list):
     for ind in population_data:
         log_ind = {
             "individual_index": ind["individual_index"],
-            # hromozom u jednom redu
             "chromosome": str(ind["chromosome"]),
-            # akordi u jednom redu
             "chords_formatted": str(ind["chords_formatted"]),
             "fitness": ind["fitness"],
             "breakdown": ind["breakdown"]
@@ -99,8 +102,8 @@ def get_individual_fitness(individual: list, soprano: list, key: key.Key, beat_s
     breakdown['final_cadence'] = check_final_cadence(chords)
     fitness += breakdown['final_cadence']
 
-    breakdown['allowed_intervals'] = check_if_allowed_intervals(individual, key)
-    fitness += breakdown['allowed_intervals']
+    breakdown['no_forbidden_intervals'] = check_if_allowed_intervals(individual, key)
+    fitness += breakdown['no_forbidden_intervals']
 
     breakdown['double_jump_dissonance'] = check_if_violates_double_jump_dissonance(individual, key)
     fitness += breakdown['double_jump_dissonance']
