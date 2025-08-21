@@ -77,15 +77,9 @@ def check_voice_overlap(chromosome: list):
         for j, (tone, alteration) in enumerate(moment[1:]):
             next_tone, next_alteration = next_moment[j]
             if tone > next_tone:
-                # print(3)
-                # print(i, moment)
-                # print(tone, next_tone)
                 score -= penalty
             elif tone == next_tone:
                 if alteration > next_alteration:
-                    # print(4)
-                    # print(i, moment)
-                    # print(tone, next_tone)
                     score -= penalty
 
     return score

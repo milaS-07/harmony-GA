@@ -10,46 +10,57 @@ from mutation import *
 
 def main():
     num_generation = 3
-    population_size = 20
+    population_size = 10
 
     broj = 5
     korpus_cist = get_bach_corpus(broj)
-
     korpus = get_clean_harmony(korpus_cist)
-
 
     sopran = get_soprano(korpus)
     sopran_chrom = soprano_to_chromosome(sopran)
 
     beat_strengths = get_beat_strengths(sopran)
-
     detected_key = sopran.analyze('key')
     
+    # --- Prva generacija ---
     population = generate_initial_population(sopran_chrom, detected_key, population_size)
-
-    print(get_population_fitness(population, sopran_chrom, detected_key, beat_strengths))
+    fitnesses = get_population_fitness(
+        population, sopran_chrom, detected_key, beat_strengths, generation_idx=0
+    )
+    print(fitnesses)
     print("---")
 
-    for _ in range(num_generation - 1):
-        fitnesses = get_population_fitness(population, sopran_chrom, detected_key, beat_strengths)
+    # --- Sledeće generacije ---
+    for gen_idx in range(1, num_generation):
+        fitnesses = get_population_fitness(
+            population, sopran_chrom, detected_key, beat_strengths, generation_idx=gen_idx
+        )
         population = select_new_population(population, fitnesses)
-        fitnesses_after_selection = get_population_fitness(population, sopran_chrom, detected_key, beat_strengths)
+        fitnesses_after_selection = get_population_fitness(
+            population, sopran_chrom, detected_key, beat_strengths, generation_idx=gen_idx
+        )
         print(fitnesses_after_selection)
         print("---")
         random.shuffle(population)
         population = do_crossover(population)
         population = mutate_population(population, detected_key)
 
+    # --- Završna generacija ---
     print("kraj")
-    fitnesses = get_population_fitness(population, sopran_chrom, detected_key, beat_strengths)
+    fitnesses = get_population_fitness(
+        population, sopran_chrom, detected_key, beat_strengths, generation_idx=num_generation
+    )
     population = select_new_population(population, fitnesses)
     print("~~~")
-    fitnesses_after_selection = get_population_fitness(population, sopran_chrom, detected_key, beat_strengths)
+    fitnesses_after_selection = get_population_fitness(
+        population, sopran_chrom, detected_key, beat_strengths, generation_idx=num_generation + 1
+    )
     print(fitnesses_after_selection)
 
-
+    # --- Najbolja jedinka ---
     best_fitness_genereted = build_full_score(sopran, population[0], detected_key)
     best_fitness_genereted.show()
+
 
 if __name__ == "__main__":
     main()

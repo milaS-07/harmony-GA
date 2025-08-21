@@ -1,3 +1,5 @@
+import os
+import json
 from constraints import *
 from music_converter import combine_voices
 
@@ -17,40 +19,104 @@ inversion_map = {
     3: "64"
 }
 
-def get_population_fitness(population: list, soprano: list, key: key.Key, beat_strengths: list):
-    return [get_individual_fitness(ind, soprano, key, beat_strengths) for ind in population]
+LOG_DIR = "logs"
+os.makedirs(LOG_DIR, exist_ok=True)
+
+def save_generation_log(generation_idx: int, population_data: list):
+    log_data = []
+
+    for ind in population_data:
+        log_ind = {
+            "individual_index": ind["individual_index"],
+            # hromozom u jednom redu
+            "chromosome": str(ind["chromosome"]),
+            # akordi u jednom redu
+            "chords_formatted": str(ind["chords_formatted"]),
+            "fitness": ind["fitness"],
+            "breakdown": ind["breakdown"]
+        }
+        log_data.append(log_ind)
+
+    file_path = os.path.join(LOG_DIR, f"generation_{generation_idx}.json")
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(log_data, f, indent=2)
+
+
+def get_population_fitness(population: list, soprano: list, key: key.Key, beat_strengths: list, generation_idx: int):
+    population_log = []
+    for ind_idx, ind in enumerate(population):
+        fitness, breakdown, chords_formatted = get_individual_fitness(
+            ind, soprano, key, beat_strengths
+        )
+
+        population_log.append({
+            "individual_index": ind_idx,
+            "chromosome": ind,
+            "fitness": fitness,
+            "breakdown": breakdown,
+            "chords_formatted": chords_formatted
+        })
+
+    save_generation_log(generation_idx, population_log)
+
+    return [ind["fitness"] for ind in population_log]
 
 def get_individual_fitness(individual: list, soprano: list, key: key.Key, beat_strengths: list):
     fitness = 0
+    breakdown = {}
 
     voices_combined = combine_voices(soprano, individual)
-
     is_minor = key.mode == 'minor'
 
-    fitness += check_voice_range(individual, key)
-    fitness += check_voice_crossing(voices_combined)
-    fitness += check_voice_overlap(voices_combined)
-    fitness += check_monotone_motion(voices_combined)
-    fitness += check_voice_spacing(voices_combined)
-    fitness += check_parallel_intervals(voices_combined)
-    
+    breakdown['voice_range'] = check_voice_range(individual, key)
+    fitness += breakdown['voice_range']
+
+    breakdown['voice_crossing'] = check_voice_crossing(voices_combined)
+    fitness += breakdown['voice_crossing']
+
+    breakdown['voice_overlap'] = check_voice_overlap(voices_combined)
+    fitness += breakdown['voice_overlap']
+
+    breakdown['monotone_motion'] = check_monotone_motion(voices_combined)
+    fitness += breakdown['monotone_motion']
+
+    breakdown['voice_spacing'] = check_voice_spacing(voices_combined)
+    fitness += breakdown['voice_spacing']
+
+    breakdown['parallel_intervals'] = check_parallel_intervals(voices_combined)
+    fitness += breakdown['parallel_intervals']
+
     score, chords = check_if_chords_exist(voices_combined, is_minor)
+    breakdown['chords'] = score
     fitness += score
 
-    fitness += check_starting_chord(chords[0])
-    fitness += check_function_transfer(chords, beat_strengths)
-    fitness += check_final_cadence(chords)
-    fitness += check_if_allowed_intervals(individual, key)
-    fitness += check_if_violates_double_jump_dissonance(individual, key)
-    fitness += check_forbidden_chord_progression(chords, beat_strengths)
-    fitness += check_if_right_fifth_sixth_tone_progression(chords, voices_combined)
-    fitness += check_chord_frequency(chords)
+    breakdown['starting_chord'] = check_starting_chord(chords[0])
+    fitness += breakdown['starting_chord']
 
-    formated = ", ".join(
+    breakdown['function_transfer'] = check_function_transfer(chords, beat_strengths)
+    fitness += breakdown['function_transfer']
+
+    breakdown['final_cadence'] = check_final_cadence(chords)
+    fitness += breakdown['final_cadence']
+
+    breakdown['allowed_intervals'] = check_if_allowed_intervals(individual, key)
+    fitness += breakdown['allowed_intervals']
+
+    breakdown['double_jump_dissonance'] = check_if_violates_double_jump_dissonance(individual, key)
+    fitness += breakdown['double_jump_dissonance']
+
+    breakdown['forbidden_progression'] = check_forbidden_chord_progression(chords, beat_strengths)
+    fitness += breakdown['forbidden_progression']
+
+    breakdown['fifth_sixth_progression'] = check_if_right_fifth_sixth_tone_progression(chords, voices_combined)
+    fitness += breakdown['fifth_sixth_progression']
+
+    breakdown['chord_frequency'] = check_chord_frequency(chords)
+    fitness += breakdown['chord_frequency']
+
+    chords_formatted = [
         f"{func_map[chord[0]]}{inversion_map[chord[1]]}" if chord is not None else "None"
         for chord in chords
-    )
+    ]
 
-    print(formated)
-
-    return fitness
+    return fitness, breakdown, chords_formatted
