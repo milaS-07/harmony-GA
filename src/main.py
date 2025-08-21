@@ -9,8 +9,8 @@ from crossover import *
 from mutation import *
 
 def main():
-    num_generation = 10
-    population_size = 10
+    num_generation = 40
+    population_size = 40
 
     broj = 5
     korpus_cist = get_bach_corpus(broj)
@@ -27,11 +27,13 @@ def main():
     fitnesses = get_population_fitness(
         population, sopran_chrom, detected_key, beat_strengths, generation_idx=0
     )
-    print(fitnesses)
+    # formatiranje za print
+    fitnesses_rounded = [round(f, 1) for f in fitnesses]
+    print(fitnesses_rounded)
     print("---")
 
     # --- Sledeće generacije ---
-    for gen_idx in range(1, num_generation):
+    for gen_idx in range(1, num_generation - 1):
         fitnesses = get_population_fitness(
             population, sopran_chrom, detected_key, beat_strengths, generation_idx=gen_idx
         )
@@ -39,7 +41,9 @@ def main():
         fitnesses_after_selection = get_population_fitness(
             population, sopran_chrom, detected_key, beat_strengths, generation_idx=gen_idx
         )
-        print(fitnesses_after_selection)
+        # formatiranje za print
+        fitnesses_after_selection_rounded = [round(f, 1) for f in fitnesses_after_selection]
+        print(fitnesses_after_selection_rounded)
         print("---")
         random.shuffle(population)
         population = do_crossover(population)
@@ -48,18 +52,20 @@ def main():
     # --- Završna generacija ---
     print("kraj")
     fitnesses = get_population_fitness(
-        population, sopran_chrom, detected_key, beat_strengths, generation_idx=num_generation
+        population, sopran_chrom, detected_key, beat_strengths, generation_idx=num_generation - 1
     )
     population = select_new_population(population, fitnesses)
     print("~~~")
     fitnesses_after_selection = get_population_fitness(
-        population, sopran_chrom, detected_key, beat_strengths, generation_idx=num_generation
+        population, sopran_chrom, detected_key, beat_strengths, generation_idx=num_generation - 1
     )
-    print(fitnesses_after_selection)
-
+    # formatiranje za print
+    fitnesses_after_selection_rounded = [round(f, 1) for f in fitnesses_after_selection]
+    print(fitnesses_after_selection_rounded)
+    
     # --- Najbolja jedinka ---
-    #best_fitness_genereted = build_full_score(sopran, population[0], detected_key)
-    #best_fitness_genereted.show()
+    best_fitness_genereted = build_full_score(sopran, population[0], detected_key)
+    best_fitness_genereted.show()
 
 
 if __name__ == "__main__":

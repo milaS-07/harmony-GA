@@ -34,9 +34,7 @@ def select_new_population(population: list, fitnesses: list):
     return elite_individuals + selected_individuals
 
 
-def normalize_fitness(fitnesses):
+def normalize_fitness(fitnesses, offset=1.0):
     f_min = min(fitnesses)
-    f_max = max(fitnesses)
-    if f_max == f_min:
-        return [1 for _ in fitnesses]
-    return [(f - f_min) / (f_max - f_min) for f in fitnesses]
+    return [f - f_min + offset for f in fitnesses]
+

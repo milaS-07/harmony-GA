@@ -31,18 +31,22 @@ def save_generation_log(generation_idx: int, population_data: list):
     log_data = []
 
     for ind in population_data:
+        fitness_formatted = round(ind["fitness"], 1)
+        breakdown_formatted = {k: round(v, 1) for k, v in ind["breakdown"].items()}
+
         log_ind = {
             "individual_index": ind["individual_index"],
             "chromosome": str(ind["chromosome"]),
             "chords_formatted": str(ind["chords_formatted"]),
-            "fitness": ind["fitness"],
-            "breakdown": ind["breakdown"]
+            "fitness": fitness_formatted,
+            "breakdown": breakdown_formatted
         }
         log_data.append(log_ind)
 
     file_path = os.path.join(LOG_DIR, f"generation_{generation_idx}.json")
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(log_data, f, indent=2)
+
 
 
 def get_population_fitness(population: list, soprano: list, key: key.Key, beat_strengths: list, generation_idx: int):
