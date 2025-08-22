@@ -48,7 +48,7 @@ def generate_individual(soprano: list, key: key.Key):
 
                 if right_voice_ranges(tone, alteration, upper_limit, key) and \
                     (random.random() < 0.15 or right_voice_spacing(moment, tone, soprano[i]))  and \
-                    (i == len(soprano) - 1 or random.random() < 0.01 or check_if_triad(soprano[i], moment + [[tone, alteration]], key)) and \
+                    (i == len(soprano) - 1 or random.random() < 0.002 or check_if_triad(soprano[i], moment + [[tone, alteration]], key)) and \
                     (i == 0 or no_voice_overlap(tone, alteration, individual[i-1], j + 1, i, soprano)) and \
                     (i != len(soprano) - 1 or random.random() < 0.05 or check_ending_chord(moment + [[tone, alteration]], soprano[i])):
                         upper_limit = chromosome_to_midi([tone, alteration], key)

@@ -9,8 +9,8 @@ from crossover import *
 from mutation import *
 
 def main():
-    num_generation = 10
-    population_size = 10
+    num_generation = 15
+    population_size = 15
 
     broj = 5
     korpus_cist = get_bach_corpus(broj)
@@ -45,7 +45,7 @@ def main():
         print("---")
         random.shuffle(population)
         population = do_crossover(population)
-        population = mutate_population(population, detected_key)
+        population = mutate_population(population, sopran_chrom, detected_key)
 
     # --- Završna generacija ---
     print("kraj")

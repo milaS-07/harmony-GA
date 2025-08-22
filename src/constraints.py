@@ -37,13 +37,13 @@ def check_voice_range(chromosome: list, key: key.Key):
             elif curr_midi < RANGES[i][0]:
                 score -= (RANGES[i][0] - curr_midi)
 
-    return score / len(chromosome)
+    return score * 2 / len(chromosome)
 
 def check_voice_crossing(chromosome: list):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    penalty = 4
+    penalty = 8
     score = 0
 
     for moment in chromosome:
@@ -61,7 +61,7 @@ def check_voice_overlap(chromosome: list):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    penalty = 3
+    penalty = 7
     score = 0
 
     for i, moment in enumerate(chromosome[:-1]):
@@ -88,11 +88,10 @@ def check_monotone_motion(chromosome: list):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    penalty = 2
+    penalty = 6
     score = 0
     for i, curr in enumerate(chromosome[1:]):
         prev = chromosome[i]
-        # ekstrakt tonova
         prev_tones = [t[0] for t in prev]
         curr_tones = [t[0] for t in curr]
 
@@ -107,7 +106,7 @@ def check_voice_spacing(chromosome: list):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    penalty = 3
+    penalty = 5
     score = 0
     for moment in chromosome:
         for i, tone in enumerate(moment[:-2]):
@@ -123,7 +122,7 @@ def check_parallel_intervals(chromosome: list):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    penalty = 4
+    penalty = 9
     score = 0
     for i, moment in enumerate(chromosome[:-1]):
         for j, voice in enumerate(moment[:-1]):
@@ -147,7 +146,7 @@ def check_if_chords_exist(chromosome: list, is_minor: bool):
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
     reward = 20
-    penalty = 30
+    penalty = 22
     score = 0
     chords = []
     
@@ -171,19 +170,19 @@ def check_if_chords_exist(chromosome: list, is_minor: bool):
 
 def check_starting_chord(starting_chord: list):
     if starting_chord == (0, 1):
-        return 6
+        return 3
     elif starting_chord == (3, 1) or starting_chord == (4, 1):
-        return 4
+        return 2
     
-    return -8
+    return -3
 
 def check_final_cadence(chords: list):
     if len(chords) < 4:
         return 0
 
     score = 0
-    reward = 7
-    penelty = 9
+    reward = 5
+    penelty = 7
 
     if chords[-1] == (0, 1):
         score += reward
@@ -191,7 +190,7 @@ def check_final_cadence(chords: list):
         score -= penelty
 
     if chords[-2] == (4, 1):
-        score += 5
+        score += 3
         if chords[-3] == (3, 1) or chords[-3] == (1, 2):
             score += 2
         elif chords[-3] == (0, 3):
