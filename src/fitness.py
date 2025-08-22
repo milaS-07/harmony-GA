@@ -36,7 +36,6 @@ def save_generation_log(generation_idx: int, population_data: list):
 
         log_ind = {
             "individual_index": ind["individual_index"],
-            "chromosome": str(ind["chromosome"]),
             "chords_formatted": str(ind["chords_formatted"]),
             "fitness": fitness_formatted,
             "breakdown": breakdown_formatted
@@ -58,7 +57,6 @@ def get_population_fitness(population: list, soprano: list, key: key.Key, beat_s
 
         population_log.append({
             "individual_index": ind_idx,
-            "chromosome": ind,
             "fitness": fitness,
             "breakdown": breakdown,
             "chords_formatted": chords_formatted

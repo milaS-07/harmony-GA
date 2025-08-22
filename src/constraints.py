@@ -145,8 +145,8 @@ def check_if_chords_exist(chromosome: list, is_minor: bool):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    reward = 20
-    penalty = 22
+    reward = 8
+    penalty = 12
     score = 0
     chords = []
     

@@ -5,7 +5,7 @@ from constraints import RANGES, get_tone
 from initial_population import right_voice_ranges, right_voice_spacing, check_if_triad, no_voice_overlap
 
 def mutate_population(population: list, soprano: list, key: key.Key):
-    mutation_rate = 0.05
+    mutation_rate = 0.07
 
     new_population = []
 
