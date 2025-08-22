@@ -61,7 +61,7 @@ def check_voice_overlap(chromosome: list):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    penalty = 7
+    penalty = 8
     score = 0
 
     for i, moment in enumerate(chromosome[:-1]):
@@ -88,7 +88,7 @@ def check_monotone_motion(chromosome: list):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    penalty = 6
+    penalty = 7
     score = 0
     for i, curr in enumerate(chromosome[1:]):
         prev = chromosome[i]
@@ -106,7 +106,7 @@ def check_voice_spacing(chromosome: list):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    penalty = 5
+    penalty = 6
     score = 0
     for moment in chromosome:
         for i, tone in enumerate(moment[:-2]):
@@ -145,8 +145,8 @@ def check_if_chords_exist(chromosome: list, is_minor: bool):
     if len(chromosome[0]) != 4:
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
-    reward = 8
-    penalty = 12
+    reward = 10
+    penalty = 13
     score = 0
     chords = []
     
@@ -190,7 +190,7 @@ def check_final_cadence(chords: list):
         score -= penelty
 
     if chords[-2] == (4, 1):
-        score += 3
+        score += 4
         if chords[-3] == (3, 1) or chords[-3] == (1, 2):
             score += 2
         elif chords[-3] == (0, 3):
@@ -204,7 +204,7 @@ def check_final_cadence(chords: list):
 
 def check_function_transfer(chords: list, beat_strengths: list):
     score = 0
-    penalty = 3
+    penalty = 6
 
     for i, chord in enumerate(chords[:-1]):
         if beat_strengths[i] == 1 and beat_strengths[i+1] == 3 and \
@@ -218,7 +218,7 @@ def check_if_allowed_intervals(chromosome: list, key: key.Key):
         raise ValueError(f"Expected moment of length 3, got {len(chromosome[0])}")
     
     score = 0
-    penelty = 5
+    penelty = 7
 
     for voice_index in range(3):
         for i in range(2):
@@ -233,7 +233,7 @@ def check_if_violates_double_jump_dissonance(chromosome: list, key: key.Key):
         raise ValueError(f"Expected moment of length 3, got {len(chromosome[0])}")
     
     score = 0
-    penelty = 5
+    penelty = 6
 
     for voice_index in range(3):
         for i,_ in enumerate(chromosome[:-2]):
@@ -246,7 +246,7 @@ def check_if_violates_double_jump_dissonance(chromosome: list, key: key.Key):
 
 def check_forbidden_chord_progression(chords: list, beat_strengths: list):
     score = 0
-    penalty = 5
+    penalty = 10
 
     for i, chord1 in enumerate(chords[:-1]):
         chord2 = chords[i+1]
@@ -255,7 +255,7 @@ def check_forbidden_chord_progression(chords: list, beat_strengths: list):
         (chord1 == (5, 1) and chord2 == (0, 1)) or \
         (chord1 == (1, 1) and chord2 == (3, 1)) or \
         (chord1 == (4, 1) and chord2 == (1, 1)) or \
-        (chord1 == (6, 1) and chord2 != (0, 1)) or \
+        (chord1 == (6, 1) or chord1 == (6, 2) and chord2 != (0, 1)) or \
         (chord1 == (0, 3) and chord2 != (4, 1)):
             score -= penalty
         elif chord1 == (0, 3) and chord2 == (4, 1) and (beat_strengths[i] == 1 or beat_strengths[i+1] > 1):
@@ -275,7 +275,7 @@ def check_if_right_fifth_sixth_tone_progression(chords: list, chromosome: list):
     
     score = 0
     reward = 5
-    penalty = 4   
+    penalty = 8   
 
     for i, chord1 in enumerate(chords[:-1]):
         chord2 = chords[i+1]
@@ -304,7 +304,7 @@ def check_chord_frequency(chords: list):
                     bonus = 20
                 score += int(bonus)
                 break
-    return score / len(chords)
+    return score / (len(chords) * 2)
 
 def identify_chord(chord: list, moment: list, is_minor: bool):
     if not verify_triad(moment, is_minor):

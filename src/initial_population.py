@@ -32,6 +32,7 @@ def generate_individual(soprano: list, key: key.Key):
 
             alteration = 0
 
+            attempts = 0
             while True:
                 if down_chrom >= up_chrom:
                     upper_limit = chromosome_to_midi([down_chrom, alteration], key)
@@ -45,6 +46,12 @@ def generate_individual(soprano: list, key: key.Key):
                 alteration = 0
                 if is_minor and get_tone([tone, 0])[0] == 6:
                     alteration = 1
+
+                attempts += 1
+                if attempts > 20000: #TODO obrisati obavezno
+                    #print("ne")
+                    moment.append([tone, alteration])
+                    break
 
                 if right_voice_ranges(tone, alteration, upper_limit, key) and \
                     (random.random() < 0.15 or right_voice_spacing(moment, tone, soprano[i]))  and \

@@ -4,16 +4,13 @@ def select_new_population(population: list, fitnesses: list):
     pop_size = len(population)
     num_elite = max(1, int(pop_size * 0.1))
 
+    # Nađi elite (kao i pre)
     sorted_indices = sorted(range(len(fitnesses)), key=lambda i: fitnesses[i], reverse=True)
     elite_indices = sorted_indices[:num_elite]
     elite_individuals = [population[i] for i in elite_indices]
 
-    remaining_indices = sorted_indices[num_elite:]
-    remaining_population = [population[i] for i in remaining_indices]
-    remaining_fitnesses = [fitnesses[i] for i in remaining_indices]
-
-    remaining_fitnesses = normalize_fitness(remaining_fitnesses)
-
+    # Roulette wheel sada uključuje sve jedinke
+    remaining_fitnesses = normalize_fitness(fitnesses)
     total_fitness = sum(remaining_fitnesses)
     if total_fitness == 0:
         probabilities = [1 / len(remaining_fitnesses)] * len(remaining_fitnesses)
@@ -28,10 +25,11 @@ def select_new_population(population: list, fitnesses: list):
         for i, p in enumerate(probabilities):
             cumulative += p
             if r <= cumulative:
-                selected_individuals.append(remaining_population[i])
+                selected_individuals.append(population[i])
                 break
 
     return elite_individuals + selected_individuals
+
 
 
 def normalize_fitness(fitnesses, offset=1.0):
