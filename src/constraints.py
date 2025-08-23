@@ -115,6 +115,8 @@ def check_voice_spacing(chromosome: list):
 
         if moment[2][0] - moment[3][0] > 14:
             score -= penalty
+        elif moment[2][0] - moment[3][0] > 9:
+            score -= 2
 
     return score / len(chromosome)
 

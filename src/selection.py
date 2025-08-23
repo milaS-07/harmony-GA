@@ -4,12 +4,10 @@ def select_new_population(population: list, fitnesses: list):
     pop_size = len(population)
     num_elite = max(1, int(pop_size * 0.1))
 
-    # Nađi elite (kao i pre)
     sorted_indices = sorted(range(len(fitnesses)), key=lambda i: fitnesses[i], reverse=True)
     elite_indices = sorted_indices[:num_elite]
     elite_individuals = [population[i] for i in elite_indices]
 
-    # Roulette wheel sada uključuje sve jedinke
     remaining_fitnesses = normalize_fitness(fitnesses)
     total_fitness = sum(remaining_fitnesses)
     if total_fitness == 0:
