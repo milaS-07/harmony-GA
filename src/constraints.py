@@ -116,7 +116,7 @@ def check_voice_spacing(chromosome: list):
         if moment[2][0] - moment[3][0] > 14:
             score -= penalty
         elif moment[2][0] - moment[3][0] > 9:
-            score -= 2
+            score -= 3
 
     return score / len(chromosome)
 
@@ -276,7 +276,7 @@ def check_if_right_fifth_sixth_tone_progression(chords: list, chromosome: list):
         raise ValueError(f"Expected moment of length 4, got {len(chromosome[0])}")
     
     score = 0
-    reward = 5
+    reward = 0
     penalty = 8   
 
     for i, chord1 in enumerate(chords[:-1]):

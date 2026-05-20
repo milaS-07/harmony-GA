@@ -4,6 +4,7 @@ def get_bach_corpus(corpus_num: int):
     for i, score in enumerate(corpus.chorales.Iterator()):
         if i == corpus_num:
             return score
+    
 
 def get_clean_harmony(score: stream.Score):
     clean_score = stream.Score()

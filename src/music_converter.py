@@ -1,7 +1,7 @@
 from music21 import *
 import math
 
-default_patterns = { #TODO treba bolje resenje
+default_patterns = {
     2: [3,1],
     3: [3,1,1],
     4: [3,1,2,1],
@@ -267,15 +267,13 @@ def build_full_score(soprano_part: stream.Part, other_voices_chrom: list, key_si
     return full_score
 
 def get_beat_strengths(soprano_part: stream.Part):
-    # uzimamo numerator prvog time signature-a (ili 4 ako ga nema)
     ts = soprano_part.recurse().getElementsByClass('TimeSignature')
     numerator = ts[0].numerator if ts else 4
 
     pattern = default_patterns.get(numerator, [1]*numerator)
 
     beat_strengths = []
-    for n in soprano_part.notes:  # bez flatten()
-        # umesto n.beat, koristimo offset u odnosu na takt (mod numerator)
+    for n in soprano_part.notes:
         beat_index = int(n.offset) % numerator
         strength = pattern[beat_index % len(pattern)]
         beat_strengths.append(strength)
