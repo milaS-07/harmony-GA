@@ -320,7 +320,7 @@ class HarmonyGAApp:
             
         stype = self.var_source_type.get()
         if stype == "corpus":
-            ttk.Label(self.frame_input_container, text="ID melodije 2-371 (npr. 107, 227):").pack(anchor="w", pady=2)
+            ttk.Label(self.frame_input_container, text="ID melodije 2-370 (npr. 107, 227):").pack(anchor="w", pady=2)
             self.ent_single_melody = ttk.Entry(self.frame_input_container, width=15)
             self.ent_single_melody.insert(0, "107")
             self.ent_single_melody.pack(anchor="w", pady=2)
